@@ -1,0 +1,83 @@
+export class AuthService {
+    constructor(userModel, followModel, bcryptService, jwtService, cryptoService, SAFE_USER) {
+        this.userModel = userModel;
+        this.followModel = followModel;
+        this.bcryptService = bcryptService;
+        this.jwtService = jwtService;
+        this.cryptoService = cryptoService;
+
+        this.SAFE_USER = SAFE_USER;
+    }
+
+    async foundByEmail(email) {
+        return await this.userModel.findOne({ where: { email } });
+    }
+
+    async foundByUsername(username) {
+        return await this.userModel.findOne({ where: { username } });
+    }
+
+    async hashPassword(password) {
+        return await this.bcryptService.hash(password);
+    }
+
+    async createUser(firstName, lastName, username, email, password) {
+        const user = await this.userModel.create({
+            firstName,
+            lastName,
+            email,
+            username,
+            password,
+        });
+        return user;
+    }
+
+    async checkPassword(password, userPassword) {
+        return await this.bcryptService.compare(password, userPassword);
+    }
+
+    async generateOTP(user) {
+        const otp = await this.cryptoService.createOTP();
+        user.otp = otp;
+        user.otpCreatedAt = Date.now();
+        user.isOtpExpired = false;
+        return await user.save();
+    }
+
+    async generateToken(id) {
+        const token = this.jwtService.sign(id);
+        return token;
+    }
+
+    async findUser({id}) {
+        const user = await this.userModel.findByPk(id, {
+            attributes: this.SAFE_USER,
+            include: [
+                {
+                    model: this.followModel,
+                    as: "followings",
+                    include: [
+                        {
+                            model: this.userModel,
+                            as: "receiver",
+                            attributes: this.SAFE_USER,
+                        },
+                    ],
+                },
+                {
+                    model: this.followModel,
+                    as: "followers",
+                    include: [
+                        {
+                            model: this.userModel,
+                            as: "sender",
+                            attributes: this.SAFE_USER,
+                        },
+                    ],
+                },
+                "posts",
+            ],
+        });
+        return user;
+    }
+};

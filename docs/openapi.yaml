@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: Social Network Backend API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:4002/api
+    description: Local API base
+
+tags:
+  - name: Auth
+  - name: Account
+  - name: Post
+  - name: Comment
+  - name: Follow
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  # ---------- AUTH ----------
+  /auth/user:
+    $ref: ../src/auth/auth.docs.yaml#/paths/~1auth~1user
+  /auth/signup:
+    $ref: ../src/auth/auth.docs.yaml#/paths/~1auth~1signup
+  /auth/signin:
+    $ref: ../src/auth/auth.docs.yaml#/paths/~1auth~1signin
+  /auth/verify:
+    $ref: ../src/auth/auth.docs.yaml#/paths/~1auth~1verify
+  /auth/forgot-password:
+    $ref: ../src/auth/auth.docs.yaml#/paths/~1auth~1forgot-password
+  /auth/reset-password:
+    $ref: ../src/auth/auth.docs.yaml#/paths/~1auth~1reset-password
+
+  # ---------- ACCOUNT ----------
+  /account/privacy:
+    $ref: ../src/account/account.docs.yaml#/paths/~1account~1privacy
+  /account/settings/email:
+    $ref: ../src/account/account.docs.yaml#/paths/~1account~1settings~1email
+  /account/settings/password:
+    $ref: ../src/account/account.docs.yaml#/paths/~1account~1settings~1password
+  /account/avatar:
+    $ref: ../src/account/account.docs.yaml#/paths/~1account~1avatar
+  /account/search/{text}:
+    $ref: ../src/account/account.docs.yaml#/paths/~1account~1search~1{text}
+  /account/{username}:
+    $ref: ../src/account/account.docs.yaml#/paths/~1account~1{username}
+
+  # ---------- FOLLOW ----------
+  /follow/requests:
+    $ref: ../src/follow/follow.docs.yaml#/paths/~1follow~1requests
+  /follow/followings:
+    $ref: ../src/follow/follow.docs.yaml#/paths/~1follow~1followings
+  /follow/followers:
+    $ref: ../src/follow/follow.docs.yaml#/paths/~1follow~1followers
+  /follow/requests/{id}/accept:
+    $ref: ../src/follow/follow.docs.yaml#/paths/~1follow~1requests~1{id}~1accept
+  /follow/requests/{id}/decline:
+    $ref: ../src/follow/follow.docs.yaml#/paths/~1follow~1requests~1{id}~1decline
+  /follow/{id}:
+    $ref: ../src/follow/follow.docs.yaml#/paths/~1follow~1{id}
+
+  # ---------- POST ----------
+  /post:
+    $ref: ../src/post/post.docs.yaml#/paths/~1post
+  /post/image:
+    $ref: ../src/post/post.docs.yaml#/paths/~1post~1image
+  /post/{postId}:
+    $ref: ../src/post/post.docs.yaml#/paths/~1post~1{postId}
+  /post/{postId}/likes:
+    $ref: ../src/post/post.docs.yaml#/paths/~1post~1{postId}~1likes
+
+  # ---------- COMMENT (nested) ----------
+  /post/{postId}/comments:
+    $ref: ../src/comment/comment.docs.yaml#/paths/~1post~1{postId}~1comments
+  /post/{postId}/comments/{commentId}:
+    $ref: ../src/comment/comment.docs.yaml#/paths/~1post~1{postId}~1comments~1{commentId}
+  /post/{postId}/comments/{commentId}/reactions:
+    $ref: ../src/comment/comment.docs.yaml#/paths/~1post~1{postId}~1comments~1{commentId}~1reactions

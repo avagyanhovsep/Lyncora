@@ -1,0 +1,171 @@
+paths:
+  /account/privacy:
+    patch:
+      tags: [Account]
+      summary: Toggle account privacy
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Updated privacy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isAccountPrivate: { type: integer, example: 1 }
+                required: [isAccountPrivate]
+        "401":
+          description: Unauthorized
+
+  /account/settings/email:
+    patch:
+      tags: [Account]
+      summary: Change email
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPasswordForEmail: { type: string, example: Passw0rd123 }
+                newEmail: { type: string, format: email, example: newmail@example.com }
+              required: [currentPasswordForEmail, newEmail]
+      responses:
+        "200":
+          description: Email changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+        "400":
+          description: Invalid credentials / wrong password / same email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+        "404":
+          description: User not found
+
+  /account/settings/password:
+    patch:
+      tags: [Account]
+      summary: Change password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPasswordForPassword: { type: string, example: Passw0rd123 }
+                newPassword: { type: string, example: Newpass123 }
+              required: [currentPasswordForPassword, newPassword]
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+        "400":
+          description: Invalid credentials / wrong password / reused password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+
+  /account/avatar:
+    patch:
+      tags: [Account]
+      summary: Upload avatar
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                profile-pic:
+                  type: string
+                  format: binary
+              required: [profile-pic]
+      responses:
+        "200":
+          description: Avatar uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  picture: { type: string, example: avatar_1700000000.png }
+                required: [picture]
+
+  /account/{username}:
+    get:
+      tags: [Account]
+      summary: Get user info by username
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: User info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    additionalProperties: true
+                required: [user]
+
+  /account/search/{text}:
+    get:
+      tags: [Account]
+      summary: Search users by firstName prefix
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: text
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Matching users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                required: [users]

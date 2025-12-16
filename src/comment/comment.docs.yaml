@@ -1,0 +1,150 @@
+paths:
+  /post/{postId}/comments:
+    get:
+      tags: [Comment]
+      summary: Get all comments for a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Comments list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                required: [comments]
+
+    post:
+      tags: [Comment]
+      summary: Add comment to a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text: { type: string, example: Nice post! }
+              required: [text]
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comment:
+                    type: object
+                    additionalProperties: true
+                required: [comment]
+
+  /post/{postId}/comments/{commentId}:
+    delete:
+      tags: [Comment]
+      summary: Delete comment (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: commentId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+        "403":
+          description: Forbidden
+        "404":
+          description: Comment not found
+
+  /post/{postId}/comments/{commentId}/reactions:
+    post:
+      tags: [Comment]
+      summary: Toggle reaction on a comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: commentId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Reaction removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  commentReactionStatus: { type: boolean, example: false }
+                required: [commentReactionStatus]
+        "201":
+          description: Reaction created
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+    get:
+      tags: [Comment]
+      summary: Get all reactions for a comment
+      description: getAllReactions() is currently empty in your controller.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: commentId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "501":
+          description: Not implemented
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+              examples:
+                notImplemented:
+                  value: { message: "Not implemented" }

@@ -1,0 +1,161 @@
+paths:
+  /post:
+    post:
+      tags: [Post]
+      summary: Create a new post
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postInformation:
+                  type: object
+                  properties:
+                    title: { type: string, example: My first post }
+                    description: { type: string, example: Hello world }
+                    location: { type: string, nullable: true, example: Glendale, CA }
+                  required: [title, description]
+                postImage: { type: string, nullable: true, example: post_1700000000.png }
+                tags:
+                  type: array
+                  items: { type: string }
+                  example: [travel, sunset]
+              required: [postInformation]
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postInfo:
+                    type: object
+                    additionalProperties: true
+                required: [postInfo]
+
+  /post/image:
+    patch:
+      tags: [Post]
+      summary: Upload post image
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                post-image:
+                  type: string
+                  format: binary
+              required: [post-image]
+      responses:
+        "200":
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  picture: { type: string, example: post_1700000000.png }
+                required: [picture]
+
+  /post/{postId}:
+    get:
+      tags: [Post]
+      summary: Get post info
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Post info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  postInfo:
+                    type: object
+                    additionalProperties: true
+                required: [postInfo]
+
+    delete:
+      tags: [Post]
+      summary: Delete post (author only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                required: [message]
+        "403":
+          description: Forbidden
+        "404":
+          description: Post not found
+
+  /post/{postId}/likes:
+    post:
+      tags: [Post]
+      summary: Toggle like on a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Toggled like
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+    get:
+      tags: [Post]
+      summary: Get all likes for a post
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Likes list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reactions:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                required: [reactions]
