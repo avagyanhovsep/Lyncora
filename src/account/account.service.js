@@ -1,7 +1,7 @@
 export class AccountService {
-    constructor(userModel, bcryptService, Op, SAFE_USER) {
+    constructor(userModel, followModel, bcryptService, Op, SAFE_USER) {
         this.userModel = userModel;
-
+        this.followModel = followModel;
         this.bcryptService = bcryptService;
         this.Op = Op;
         this.SAFE_USER = SAFE_USER;
@@ -10,8 +10,32 @@ export class AccountService {
     async findUser(params) {
         return await this.userModel.findOne({
             where: params,
-            include: ["followers", "followings", "posts"],
-            attributes: [...this.SAFE_USER, 'password'],
+            attributes: this.SAFE_USER,
+            include: [
+                {
+                    model: this.followModel,
+                    as: "followings",
+                    include: [
+                        {
+                            model: this.userModel,
+                            as: "receiver",
+                            attributes: this.SAFE_USER,
+                        },
+                    ],
+                },
+                {
+                    model: this.followModel,
+                    as: "followers",
+                    include: [
+                        {
+                            model: this.userModel,
+                            as: "sender",
+                            attributes: this.SAFE_USER,
+                        },
+                    ],
+                },
+                "posts",
+            ],
         });
     }
 
@@ -27,7 +51,7 @@ export class AccountService {
     }
 
     async changePrivacy(id) {
-        const user = await this.findUser({id});
+        const user = await this.findUser({ id });
         user.isAccountPrivate = 1 - user.isAccountPrivate;
         return await user.save();
     }

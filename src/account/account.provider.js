@@ -10,13 +10,14 @@ import { SAFE_USER } from "../../lib/attributes.js";
 import { BcryptService } from './bcrypt.service.js';
 
 const bcryptService = new BcryptService(bcrypt);
-const accountService = new AccountService(models.User, bcryptService, Op, SAFE_USER);
+const accountService = new AccountService(models.User, models.Follow, bcryptService, Op, SAFE_USER);
 const accountController = new AccountController(accountService);
 
 const loader = {};
 
 loader.models = {
-    User: models.User
+    User: models.User,
+    Follow: models.Follow
 }
 
 loader.services = {

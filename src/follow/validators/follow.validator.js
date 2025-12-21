@@ -17,7 +17,6 @@ export default async function followValidator(service, req, res, next) {
     }
 
     const found = await service.getRequest(from, to);
-
     if (account.isAccountPrivate) {
         if (found && found.approved === false) {
             await found.destroy();

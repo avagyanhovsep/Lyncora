@@ -22,12 +22,12 @@ followRouter.post(
     followController.getFollowers
 );
 followRouter.patch(
-    "/requests/:id/accept",
+    "/requests/accept",
     acceptRequestValidator,
     followController.acceptRequest
 );
 followRouter.patch(
-    "/requests/:id/decline",
+    "/requests/decline",
     declineRequestValidator,
     followController.declineRequest
 );

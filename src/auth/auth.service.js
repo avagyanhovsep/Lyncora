@@ -50,7 +50,7 @@ export class AuthService {
     }
 
     async findUser({id}) {
-        const user = await this.userModel.findByPk(id, {
+        return await this.userModel.findByPk(id, {
             attributes: this.SAFE_USER,
             include: [
                 {
@@ -78,6 +78,5 @@ export class AuthService {
                 "posts",
             ],
         });
-        return user;
     }
 };

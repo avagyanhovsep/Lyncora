@@ -31,7 +31,7 @@ export class FollowController {
     }
 
     async follow(req, res) {
-        const result = await this.service.createService(from, to, true, false);
-        return res.send({ status: "Followed", result });
+        const result = await this.service.createRequest(from, to, true, false);
+        return res.status(200).send({ status: "Followed", result });
     }
 }
