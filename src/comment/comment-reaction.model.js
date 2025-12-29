@@ -10,9 +10,16 @@ export default function (sequelize, DataTypes) {
     });
 
     CommentReaction.associate = (models) => {
-        CommentReaction.belongsTo(models.User, { foreignKey: "userId", as: "user" });
-        CommentReaction.belongsTo(models.Comment, { foreignKey: "commentId", as: "comment" });
-    }
+        CommentReaction.belongsTo(models.User, {
+            foreignKey: "userId",
+            as: "user",
+            onDelete: "CASCADE",
+        });
+        CommentReaction.belongsTo(models.Comment, {
+            foreignKey: "commentId",
+            as: "comment",
+        });
+    };
 
     return CommentReaction;
 }

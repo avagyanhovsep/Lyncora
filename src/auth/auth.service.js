@@ -1,5 +1,12 @@
 export class AuthService {
-    constructor(userModel, followModel, bcryptService, jwtService, cryptoService, SAFE_USER) {
+    constructor(
+        userModel,
+        followModel,
+        bcryptService,
+        jwtService,
+        cryptoService,
+        SAFE_USER
+    ) {
         this.userModel = userModel;
         this.followModel = followModel;
         this.bcryptService = bcryptService;
@@ -41,7 +48,8 @@ export class AuthService {
         user.otp = otp;
         user.otpCreatedAt = Date.now();
         user.isOtpExpired = false;
-        return await user.save();
+        await user.save();
+        return otp;
     }
 
     async generateToken(id) {
@@ -49,7 +57,19 @@ export class AuthService {
         return token;
     }
 
-    async findUser({id}) {
+    async resendOTP(user, throttleMs) {
+        const createdAt = new Date(user.otpCreatedAt).getTime();
+        const withinWindow = Date.now() - createdAt < throttleMs;
+
+        if (user.otp && withinWindow && user.isOtpExpired === false) {
+            return { otp: user.otp, reused: true };
+        }
+
+        const otp = await this.generateOTP(user);
+        return { otp, reused: false };
+    }
+
+    async findUser({ id }) {
         return await this.userModel.findByPk(id, {
             attributes: this.SAFE_USER,
             include: [
@@ -79,4 +99,4 @@ export class AuthService {
             ],
         });
     }
-};
+}

@@ -10,15 +10,20 @@ export class PostController {
     }
 
     async createNewPost(req, res) {
-        const { postInformation, postImage, tags } = req.body;
-        const { title, description } = postInformation;
+        const {
+            postInformation: { title, description, location },
+            postImage,
+            tags,
+        } = req.body;
+        const { id } = req.user;
+
         const newPost = await this.service.createPost(
             title,
             description,
-            req.user.id,
+            id,
             postImage,
             tags,
-            postInformation.location
+            location
         );
         const postInfo = await this.service.findPost(newPost.id);
 
@@ -41,9 +46,9 @@ export class PostController {
     }
 
     async like(req, res) {
-        const userId = req.user.id;
+        const { id } = req.user;
         const { postId } = req.params;
-        const reaction = await this.service.createReaction(userId, postId);
+        const reaction = await this.service.createReaction(id, postId);
         return res.status(200).send({ reactionStatus: true, reaction });
     }
 

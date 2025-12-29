@@ -10,7 +10,12 @@ export default function (sequelize, DataTypes) {
     });
 
     PostReaction.associate = (models) => {
-        PostReaction.belongsTo(models.User, { foreignKey: "userId", as: "reactedBy" });
-    }
+        PostReaction.belongsTo(models.User, {
+            foreignKey: "userId",
+            as: "reactedBy",
+            onDelete: "CASCADE",
+            onUpdate: "CASCADE",
+        });
+    };
     return PostReaction;
 }

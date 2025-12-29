@@ -1,11 +1,15 @@
 export class AccountController {
-    constructor(service) {
+    constructor(service, sendEmail) {
         this.service = service;
+        this.sendEmail = sendEmail;
 
         this.getUserInfo = this.getUserInfo.bind(this);
         this.searchUsers = this.searchUsers.bind(this);
         this.setAccountPrivacy = this.setAccountPrivacy.bind(this);
         this.handleAvatarUpload = this.handleAvatarUpload.bind(this);
+        this.updateBio = this.updateBio.bind(this);
+        this.updateTheme = this.updateTheme.bind(this);
+        this.deleteAccount = this.deleteAccount.bind(this);
     }
 
     async getUserInfo(req, res) {
@@ -21,8 +25,8 @@ export class AccountController {
     }
 
     async setAccountPrivacy(req, res) {
-        const userId = req.user.id;
-        const user = await this.service.changePrivacy(userId);
+        const { id } = req.user;
+        const user = await this.service.changePrivacy(id);
         return res
             .status(200)
             .send({ isAccountPrivate: user.isAccountPrivate });
@@ -43,5 +47,27 @@ export class AccountController {
         user.avatar = req.file.filename;
         await user.save();
         return res.status(200).send({ picture: req.file.filename });
+    }
+
+    async updateBio(req, res) {
+        const { id } = req.user;
+        const { bio } = req.body;
+
+        await this.service.setBio(id, bio);
+        return res
+            .status(200)
+            .send({ bio, message: "Bio updated successfully!" });
+    }
+
+    async updateTheme(req, res) {
+        const { id } = req.user;
+        const { theme } = req.body;
+
+        await this.service.setTheme(id, theme);
+        return res.status(200).send({ theme });
+    }
+
+    async deleteAccount(req, res) {
+        return res.status(200).send({ message: "Account deleted" });
     }
 }

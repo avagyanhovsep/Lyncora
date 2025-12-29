@@ -10,6 +10,6 @@ export default async function deleteCommentValidator(service, req, res, next) {
         return res.status(403).send({ message: "Forbidden" });
     }
 
-    req.comment = comment; 
+    req.comment = comment;
     return next();
 }

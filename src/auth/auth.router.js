@@ -15,31 +15,13 @@ const {
     resetPasswordValidator,
 } = init.validators;
 
-authRouter.get(
-    "/user",
-    isAuthenticated,
-    authController.getUser
-);
-
 authRouter.post(
     "/signup",
-    [
-        signupValidator,
-        signupPipe,
-    ],
+    [signupValidator, signupPipe],
     authController.signup
 );
-
-authRouter.post(
-    "/signin",
-    signinValidator,
-    authController.signin
-);
-authRouter.post(
-    "/verify",
-    verifyValidator,
-    authController.verify
-);
+authRouter.post("/signin", signinValidator, authController.signin);
+authRouter.post("/verify", verifyValidator, authController.verify);
 authRouter.post(
     "/forgot-password",
     forgotPasswordValidator,
@@ -50,3 +32,5 @@ authRouter.post(
     resetPasswordValidator,
     authController.resetPassword
 );
+
+authRouter.get("/user", isAuthenticated, authController.getUser);

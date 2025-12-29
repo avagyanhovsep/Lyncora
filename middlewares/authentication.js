@@ -15,8 +15,8 @@ export const isAuthenticated = (service, req, res, next) => {
         if (err || !payload?.id) {
             return res.status(403).send({ message: "Forbidden" });
         }
-        
-        const user = await service.findUser({id: payload.id});
+
+        const user = await service.findUser({ id: payload.id });
         if (!user) {
             return res.status(404).send({ message: "User not found" });
         }

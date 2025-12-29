@@ -13,21 +13,24 @@ import { BcryptService } from "./bcrypt.service.js";
 import { CryptoService } from "./crypto.service.js";
 import { JWTService } from "./jwt.service.js";
 import { signupPipe } from "./pipes/signup.pipe.js";
-import { SAFE_USER } from '../../lib/attributes.js';
+import { SAFE_USER } from "../../lib/attributes.js";
 import { isAuthenticated } from "../../middlewares/authentication.js";
+import { sendEmail } from "../../lib/mailer.js";
 
 const bcryptService = new BcryptService(bcrypt);
 const jwtService = new JWTService(jwt);
 const cryptoService = new CryptoService(crypto);
-export const authService = new AuthService(models.User, models.Follow, bcryptService, jwtService, cryptoService, SAFE_USER);
-const authController = new AuthController(authService);
+export const authService = new AuthService(
+    models.User,
+    models.Follow,
+    bcryptService,
+    jwtService,
+    cryptoService,
+    SAFE_USER
+);
+const authController = new AuthController(authService, sendEmail);
 
 const loader = {};
-
-loader.models = {
-    User: models.User,
-    Follow: models.Follow,
-};
 
 loader.services = {
     authService,
@@ -46,10 +49,18 @@ loader.middlewares = {
 
 loader.validators = {
     signupValidator: signupValidator.bind(null, authService),
-    signinValidator: signinValidator.bind(null, authService),
-    verifyValidator: verifyValidator.bind(null, authService),
-    forgotPasswordValidator: forgotPasswordValidator.bind(null, authService),
-    resetPasswordValidator: resetPasswordValidator.bind(null, authService),
+    signinValidator: signinValidator.bind(null, authService, sendEmail),
+    verifyValidator: verifyValidator.bind(null, authService, sendEmail),
+    forgotPasswordValidator: forgotPasswordValidator.bind(
+        null,
+        authService,
+        sendEmail
+    ),
+    resetPasswordValidator: resetPasswordValidator.bind(
+        null,
+        authService,
+        sendEmail
+    ),
 };
 
 loader.pipes = {

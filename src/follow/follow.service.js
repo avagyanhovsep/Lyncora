@@ -40,11 +40,13 @@ export class FollowService {
     }
 
     async getUser(id) {
-        return await this.userModel.findByPk(id, { attributes: this.SAFE_USER});
+        return await this.userModel.findByPk(id, {
+            attributes: this.SAFE_USER,
+        });
     }
 
     async getRequest(from, to) {
-        return await this.followModel.findOne({where: {from, to}});
+        return await this.followModel.findOne({ where: { from, to } });
     }
 
     async createRequest(from, to, approved, requested) {

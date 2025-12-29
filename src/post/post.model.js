@@ -31,20 +31,24 @@ export default function (sequelize, DataTypes) {
         Post.belongsTo(models.User, {
             foreignKey: "authorId",
             as: "author",
+            onDelete: "CASCADE",
+            onUpdate: "CASCADE",
         });
         Post.hasMany(models.Comment, {
             foreignKey: "postId",
             as: "postComments",
             onDelete: "CASCADE",
+
             hooks: true,
         });
         Post.hasMany(models.PostReaction, {
             foreignKey: "postId",
             as: "postReactions",
             onDelete: "CASCADE",
+            onUpdate: "CASCADE",
             hooks: true,
         });
-    }
+    };
 
     return Post;
 }

@@ -7,6 +7,6 @@ export default async function declineRequestValidator(service, req, res, next) {
     }
 
     await request.destroy();
-    
+
     return next();
 }

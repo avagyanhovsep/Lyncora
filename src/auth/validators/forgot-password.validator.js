@@ -1,4 +1,10 @@
-export default async function forgotPasswordValidator(service, req, res, next) {
+export default async function forgotPasswordValidator(
+    service,
+    sendEmail,
+    req,
+    res,
+    next
+) {
     const { email } = req.body;
 
     if (!email) {
@@ -11,7 +17,13 @@ export default async function forgotPasswordValidator(service, req, res, next) {
         return res.status(404).send({ message: "User not found..." });
     }
 
-    await service.generateOTP(user);
+    const otp = await service.generateOTP(user);
+
+    void sendEmail(
+        user.email,
+        "Reset your Lyncora password",
+        `You requested a password reset. \n\nYour verification code is ${otp}. It expires in 2 minutes. \n\nIf you did not request this, you can safely ignore this email.`
+    );
 
     return next();
 }

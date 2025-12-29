@@ -1,16 +1,29 @@
 export class AccountService {
-    constructor(userModel, followModel, bcryptService, Op, SAFE_USER) {
+    constructor(
+        userModel,
+        followModel,
+        bcryptService,
+        chatService,
+        sequelize,
+        Op,
+        SAFE_USER
+    ) {
         this.userModel = userModel;
         this.followModel = followModel;
         this.bcryptService = bcryptService;
+        this.chatService = chatService;
+        this.sequelize = sequelize;
         this.Op = Op;
         this.SAFE_USER = SAFE_USER;
+
+        this.deleteUserAccount = this.deleteUserAccount.bind(this);
     }
 
     async findUser(params) {
         return await this.userModel.findOne({
             where: params,
-            attributes: this.SAFE_USER,
+            attributes: [...this.SAFE_USER, "password"],
+            paranoid: false,
             include: [
                 {
                     model: this.followModel,
@@ -62,5 +75,44 @@ export class AccountService {
 
     async hashPassword(password) {
         return await this.bcryptService.hash(password);
+    }
+
+    async setBio(id, bio) {
+        return await this.userModel.update({ bio }, { where: { id } });
+    }
+
+    async setTheme(id, theme) {
+        return await this.userModel.update({ theme }, { where: { id } });
+    }
+
+    async deleteUserAccount(userId) {
+        return await this.sequelize.transaction(async (t) => {
+            const user = await this.userModel.findOne({
+                where: { id: userId },
+                attributes: ["email", "username", "firstName", "lastName"],
+                transaction: t,
+                paranoid: false,
+            });
+
+            if (!user) return null;
+
+            const { email, username, firstName, lastName } = user;
+
+            await this.chatService.cleanupChatsForDeletedUser(userId, t);
+
+            await this.followModel.destroy({
+                where: {
+                    [this.Op.or]: [{ from: userId }, { to: userId }],
+                },
+                transaction: t,
+            });
+
+            await this.userModel.destroy({
+                where: { id: userId },
+                transaction: t,
+            });
+
+            return { email, username, firstName, lastName };
+        });
     }
 }

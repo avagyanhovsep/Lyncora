@@ -1,5 +1,5 @@
 import express from "express";
-import init from './comment.provider.js';
+import init from "./comment.provider.js";
 
 export const commentRouter = express.Router({ mergeParams: true });
 
@@ -9,26 +9,16 @@ const { deleteCommentValidator, reactValidator } = init.validators;
 
 commentRouter.use(isAuthenticated);
 
-commentRouter.get(
-    "/",
-    commentController.getAllComments
-);
-commentRouter.post(
-    "/",
-    commentController.addComment
-);
+commentRouter.get("/", commentController.getAllComments);
+commentRouter.post("/", commentController.addComment);
 commentRouter.delete(
     "/:commentId",
     deleteCommentValidator,
     commentController.deleteComment
 );
-
 commentRouter.post(
     "/:commentId/reactions",
     reactValidator,
     commentController.react
 );
-commentRouter.get(
-    "/:commentId/reactions",
-    commentController.getAllReactions
-);
+commentRouter.get("/:commentId/reactions", commentController.getAllReactions);

@@ -62,9 +62,9 @@ export class CommentService {
     }
 
     async createCommentReaction(commentId, userId) {
-        return await this.commentReactionModel.create({commentId, userId})
+        return await this.commentReactionModel.create({ commentId, userId });
     }
-    
+
     async deleteUserComment(comment) {
         return await comment.destroy();
     }

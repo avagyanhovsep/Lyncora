@@ -1,5 +1,6 @@
 export default async function accountChangePasswordValidator(
     service,
+    sendEmail,
     req,
     res,
     next
@@ -34,6 +35,12 @@ export default async function accountChangePasswordValidator(
 
     user.password = await service.hashPassword(newPassword);
     await user.save();
+
+    void sendEmail(
+        user.email,
+        "Your Lyncora password was changed",
+        `Your Lyncora password has been changed successfully. \n\nIf you did not make this change, reset your password immediately and contact support.`
+    );
 
     return next();
 }

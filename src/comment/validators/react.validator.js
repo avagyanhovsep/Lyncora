@@ -11,4 +11,3 @@ export default async function reactValidator(service, req, res, next) {
 
     return next();
 }
- 

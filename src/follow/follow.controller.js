@@ -1,6 +1,11 @@
 export class FollowController {
     constructor(service) {
         this.service = service;
+
+        this.getRequests = this.getRequests.bind(this);
+        this.getFollowings = this.getFollowings.bind(this);
+        this.getFollowers = this.getFollowers.bind(this);
+        this.follow = this.follow.bind(this);
     }
 
     async getRequests(req, res) {
@@ -9,16 +14,14 @@ export class FollowController {
     }
 
     async getFollowings(req, res) {
-        const followings = await this.service.getAllFollowings(
-            req.body.followingsInfo
-        );
+        const { followingsInfo } = req.body;
+        const followings = await this.service.getAllFollowings(followingsInfo);
         return res.status(200).send({ followings });
     }
 
     async getFollowers(req, res) {
-        const followers = await this.service.getAllFollowers(
-            req.body.followersInfo
-        );
+        const { followersInfo } = req.body;
+        const followers = await this.service.getAllFollowers(followersInfo);
         return res.status(200).send({ followers });
     }
 
@@ -31,6 +34,8 @@ export class FollowController {
     }
 
     async follow(req, res) {
+        const { id: to } = req.params;
+        const { id: from } = req.user;
         const result = await this.service.createRequest(from, to, true, false);
         return res.status(200).send({ status: "Followed", result });
     }

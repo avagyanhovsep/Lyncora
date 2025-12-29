@@ -1,238 +1,463 @@
 paths:
-  /auth/user:
-    get:
-      tags: [Auth]
-      summary: Get current authenticated user
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: Current user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    type: object
-                    additionalProperties: true
-                required: [user]
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
+    /auth/signup:
+        post:
+            tags: [Auth]
+            summary: Create a new user account
+            description: Creates a user account and sends a welcome email.
+            security: [] # public
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/SignupRequest"
+            responses:
+                "201":
+                    description: Account created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                created:
+                                    value:
+                                        message: "john_doe has signed up successfully!"
+                "400":
+                    description: Validation error (missing fields, invalid formats, already used username/email)
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                missing:
+                                    value:
+                                        message: "Missing/Invalid credentials..."
+                                bad_firstname:
+                                    value:
+                                        message: "First name must be 2-18 letters."
+                                bad_lastname:
+                                    value:
+                                        message: "Last name must be 2-18 letters."
+                                bad_username:
+                                    value:
+                                        message: "Username must be 3-18 characters and use only letters, numbers, or underscores."
+                                bad_email:
+                                    value:
+                                        message: "Email format is invalid."
+                                bad_password:
+                                    value:
+                                        message: "Password must be 8-18 characters and include both letters and numbers."
+                                email_in_use:
+                                    value:
+                                        message: "Email is already in use..."
+                                username_in_use:
+                                    value:
+                                        message: "Username is already in use..."
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
 
-  /auth/signup:
-    post:
-      tags: [Auth]
-      summary: Signup
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                firstName: { type: string, example: John }
-                lastName: { type: string, example: Doe }
-                username: { type: string, example: john_doe7 }
-                email: { type: string, format: email, example: john@example.com }
-                password: { type: string, example: Passw0rd123 }
-              required: [firstName, lastName, username, email, password]
-      responses:
-        "201":
-          description: User created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
+    /auth/signin:
+        post:
+            tags: [Auth]
+            summary: Sign in
+            description: |
+                Validates credentials. If the account is not verified (isSigninAllowed=false), an OTP may be re-sent.
+                Returns a JWT token and a suggested frontend redirect endpoint.
+            security: [] # public
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/SigninRequest"
+            responses:
+                "200":
+                    description: Sign-in accepted (token issued; OTP may have been sent depending on account status)
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/SigninResponse"
+                            examples:
+                                ok_verified:
+                                    value:
+                                        message: "Code sent, please check your email to confirm the account..."
+                                        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        endpoint: "/profile"
+                                ok_needs_verify:
+                                    value:
+                                        message: "Code sent, please check your email to confirm the account..."
+                                        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        endpoint: "/signin/confirm-your-account"
+                "400":
+                    description: Invalid credentials or wrong password/email
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                missing:
+                                    value:
+                                        message: "Invalid/Missing credentials!"
+                                wrong:
+                                    value:
+                                        message: "Wrong Credentials..."
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
 
-  /auth/signin:
-    post:
-      tags: [Auth]
-      summary: Signin (email + password) -> generates OTP, returns token + endpoint
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email: { type: string, format: email, example: john@example.com }
-                password: { type: string, example: Passw0rd123 }
-              required: [email, password]
-      responses:
-        "200":
-          description: Token + endpoint returned
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                  token: { type: string }
-                  endpoint: { type: string }
-                required: [message, token, endpoint]
-        "400":
-          description: Wrong or missing credentials
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
+    /auth/verify:
+        post:
+            tags: [Auth]
+            summary: Verify account using OTP
+            description: |
+                Verifies an account using email + otp. If OTP is expired, a new OTP is generated and emailed,
+                and the response returns 400 with an "expired" message.
+            security: [] # public
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/VerifyRequest"
+            responses:
+                "200":
+                    description: Account verified
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                success:
+                                    value:
+                                        message: "Account verified successfully!"
+                "400":
+                    description: Wrong/expired OTP or missing fields
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                missing:
+                                    value:
+                                        message: "Unverified..."
+                                expired:
+                                    value:
+                                        message: "The code is expired, we sent you the new one, please check your email..."
+                                wrong_code:
+                                    value:
+                                        message: "Wrong code"
+                "404":
+                    description: User not found by email
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                not_found:
+                                    value:
+                                        message: "User not found..."
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
 
-  /auth/verify:
-    post:
-      tags: [Auth]
-      summary: Verify OTP
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email: { type: string, format: email, example: john@example.com }
-                otp: { type: string, example: "123456" }
-              required: [email, otp]
-      responses:
-        "200":
-          description: Account verified
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "400":
-          description: Wrong code / missing OTP
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "401":
-          description: OTP expired (new code sent)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
+    /auth/forgot-password:
+        post:
+            tags: [Auth]
+            summary: Request password reset OTP
+            description: Generates an OTP and emails it to the user for password reset.
+            security: [] # public
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ForgotPasswordRequest"
+            responses:
+                "200":
+                    description: Reset email sent
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                success:
+                                    value:
+                                        message: "Please check your email to reset your password!"
+                "400":
+                    description: Missing/invalid email
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                missing:
+                                    value:
+                                        message: "Invalid/Missing credentials..."
+                "404":
+                    description: User not found by email
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                not_found:
+                                    value:
+                                        message: "User not found..."
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
 
-  /auth/forgot-password:
-    post:
-      tags: [Auth]
-      summary: Forgot password (generates OTP)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email: { type: string, format: email, example: john@example.com }
-              required: [email]
-      responses:
-        "200":
-          description: Reset email sent
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "400":
-          description: Missing email
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
+    /auth/reset-password:
+        post:
+            tags: [Auth]
+            summary: Reset password
+            description: |
+                Resets password for a user (by email) after validating the new password format and ensuring it's not reused.
+                Note: Your current code validates password + email but does not verify OTP here.
+            security: [] # public
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ResetPasswordRequest"
+            responses:
+                "200":
+                    description: Password reset completed
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                success:
+                                    value:
+                                        message: "Your password has been reset successfully!"
+                "400":
+                    description: Validation error (missing password, weak password, reused password, etc.)
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MessageResponse"
+                            examples:
+                                missing:
+                                    value:
+                                        message: "Invalid/Missing credentials..."
+                                weak:
+                                    value:
+                                        message: "Password must be 8-18 characters and include both letters and numbers."
+                                reused:
+                                    value:
+                                        message: "You have already used this password previously..."
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
 
-  /auth/reset-password:
-    post:
-      tags: [Auth]
-      summary: Reset password (email + new password)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email: { type: string, format: email, example: john@example.com }
-                password: { type: string, example: Newpass123 }
-              required: [email, password]
-      responses:
-        "200":
-          description: Password reset successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
-        "400":
-          description: Validation error / reused password
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message: { type: string }
-                required: [message]
+    /auth/user:
+        get:
+            tags: [Auth]
+            summary: Get current authenticated user
+            description: Returns the authenticated user's profile (SAFE_USER fields) including followings, followers, and posts.
+            security:
+                - bearerAuth: []
+            responses:
+                "200":
+                    description: Current user returned
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    user:
+                                        $ref: "#/components/schemas/UserProfile"
+                                required: [user]
+                "401":
+                    $ref: "#/components/responses/Unauthorized"
+                "403":
+                    $ref: "#/components/responses/Forbidden"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+components:
+    schemas:
+        MessageResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+            required: [message]
+
+        SignupRequest:
+            type: object
+            properties:
+                firstName:
+                    type: string
+                    example: "John"
+                lastName:
+                    type: string
+                    example: "Doe"
+                username:
+                    type: string
+                    example: "john_doe"
+                email:
+                    type: string
+                    format: email
+                    example: "john@example.com"
+                password:
+                    type: string
+                    description: "8-18 chars, must include letters and numbers"
+                    example: "Password123"
+            required: [firstName, lastName, username, email, password]
+
+        SigninRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: "john@example.com"
+                password:
+                    type: string
+                    example: "Password123"
+            required: [email, password]
+
+        SigninResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                token:
+                    type: string
+                    description: JWT token (expires in 1h per JWTService)
+                endpoint:
+                    type: string
+                    description: Suggested frontend redirect path
+            required: [message, token, endpoint]
+
+        VerifyRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: "john@example.com"
+                otp:
+                    type: string
+                    example: "123456"
+            required: [email, otp]
+
+        ForgotPasswordRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: "john@example.com"
+            required: [email]
+
+        ResetPasswordRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: "john@example.com"
+                password:
+                    type: string
+                    description: "8-18 chars, must include letters and numbers"
+                    example: "Newpass123"
+            required: [email, password]
+
+        UserSafe:
+            type: object
+            description: Safe user fields (based on SAFE_USER constant in your codebase).
+            properties:
+                id:
+                    type: integer
+                    example: 113
+                username:
+                    type: string
+                    example: "avagyanhovsep"
+                firstName:
+                    type: string
+                    example: "Hovsep"
+                lastName:
+                    type: string
+                    example: "Avagyan"
+                avatar:
+                    type: string
+                    nullable: true
+                    example: "1735321123456-avatar.png"
+                bio:
+                    type: string
+                    nullable: true
+                    example: "Building Lyncora."
+                theme:
+                    type: string
+                    nullable: false
+                    example: "system"
+                isAccountPrivate:
+                    type: boolean
+                    example: false
+
+        UserProfile:
+            allOf:
+                - $ref: "#/components/schemas/UserSafe"
+                - type: object
+                  properties:
+                      followings:
+                          type: array
+                          items:
+                              type: object
+                              properties:
+                                  receiver:
+                                      $ref: "#/components/schemas/UserSafe"
+                      followers:
+                          type: array
+                          items:
+                              type: object
+                              properties:
+                                  sender:
+                                      $ref: "#/components/schemas/UserSafe"
+                      posts:
+                          type: array
+                          items:
+                              type: object
+                              description: Post schema placeholder (replace with your actual Post schema if defined elsewhere).
+                              properties:
+                                  id:
+                                      type: integer
+                                  text:
+                                      type: string
+                                  createdAt:
+                                      type: string
+                                      format: date-time
+
+    responses:
+        Unauthorized:
+            description: Missing/invalid auth token
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/MessageResponse"
+                    examples:
+                        unauthorized:
+                            value:
+                                message: "Unauthorized"
+
+        Forbidden:
+            description: Authenticated but not allowed
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/MessageResponse"
+                    examples:
+                        forbidden:
+                            value:
+                                message: "Forbidden"
+
+        InternalServerError:
+            description: Server error
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/MessageResponse"
+                    examples:
+                        error:
+                            value:
+                                message: "Internal server error"

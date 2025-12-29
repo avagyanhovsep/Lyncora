@@ -18,8 +18,18 @@ export default function (sequelize, DataTypes) {
     });
 
     Follow.associate = (models) => {
-        Follow.belongsTo(models.User, { foreignKey: "from", as: "sender" });
-        Follow.belongsTo(models.User, { foreignKey: "to", as: "receiver" });
+        Follow.belongsTo(models.User, {
+            foreignKey: "from",
+            as: "sender",
+            onDelete: "CASCADE",
+            onUpdate: "CASCADE",
+        });
+        Follow.belongsTo(models.User, {
+            foreignKey: "to",
+            as: "receiver",
+            onDelete: "CASCADE",
+            onUpdate: "CASCADE",
+        });
     };
 
     return Follow;

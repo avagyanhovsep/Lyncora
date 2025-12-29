@@ -19,8 +19,8 @@ export class CommentController {
     async addComment(req, res) {
         const { postId } = req.params;
         const { text } = req.body;
-        const userId = req.user.id;
-        const comment = await this.service.createComment(postId, userId, text);
+        const { id } = req.user;
+        const comment = await this.service.createComment(postId, id, text);
         return res.status(201).send({ comment });
     }
 
@@ -33,11 +33,11 @@ export class CommentController {
 
     async react(req, res) {
         const { commentId } = req.params;
-        const userId = req.user.id;
+        const { id } = req.user;
 
         const commentReaction = await this.service.createCommentReaction(
             commentId,
-            userId
+            id
         );
 
         await commentReaction.reload({
@@ -48,7 +48,9 @@ export class CommentController {
             },
         });
 
-        return res.status(201).send({ commentReactionStatus: true, commentReaction });
+        return res
+            .status(201)
+            .send({ commentReactionStatus: true, commentReaction });
     }
 
     async getAllReactions(req, res) {}

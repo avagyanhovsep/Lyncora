@@ -1,26 +1,16 @@
-import express from 'express';
-import init from './follow.provider.js';
+import express from "express";
+import init from "./follow.provider.js";
 
 export const followRouter = express.Router();
 
 const { followController } = init.controllers;
 const { isAuthenticated } = init.middlewares;
-const { acceptRequestValidator, declineRequestValidator, followValidator } = init.validators;
+const { acceptRequestValidator, declineRequestValidator, followValidator } =
+    init.validators;
 
 followRouter.use(isAuthenticated);
 
-followRouter.get(
-    '/requests',
-    followController.getRequests
-);
-followRouter.post(
-    "/followings",
-    followController.getFollowings
-);
-followRouter.post(
-    "/followers",
-    followController.getFollowers
-);
+followRouter.get("/requests", followController.getRequests);
 followRouter.patch(
     "/requests/accept",
     acceptRequestValidator,
@@ -31,8 +21,6 @@ followRouter.patch(
     declineRequestValidator,
     followController.declineRequest
 );
-followRouter.post(
-    "/:id",
-    followValidator,
-    followController.follow
-);
+followRouter.post("/followings", followController.getFollowings);
+followRouter.post("/followers", followController.getFollowers);
+followRouter.post("/:id", followValidator, followController.follow);

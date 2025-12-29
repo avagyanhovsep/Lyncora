@@ -1,24 +1,37 @@
-import models from '../../config/database/index.js';
+import models from "../../config/database/index.js";
 import accountChangeEmailValidator from "./validators/account-change-email.validator.js";
 import accountChangePasswordValidator from "./validators/account-change-password.validator.js";
 import bcrypt from "bcrypt";
-import { AccountController } from './account.controller.js';
-import { AccountService } from './account.service.js';
-import { isAuthenticated } from '../../middlewares/authentication.js';
+import { AccountController } from "./account.controller.js";
+import { AccountService } from "./account.service.js";
+import { isAuthenticated } from "../../middlewares/authentication.js";
 import { Op } from "sequelize";
 import { SAFE_USER } from "../../lib/attributes.js";
-import { BcryptService } from './bcrypt.service.js';
+import { BcryptService } from "./bcrypt.service.js";
+import updateBioValidator from "./validators/update-bio.validator.js";
+import { sendEmail } from "../../lib/mailer.js";
+import { chatService } from "../chat/chat.provider.js";
+import { sequelize } from "../../config/database/database.config.js";
+import deleteAccountValidator from "./validators/delete-account.validator.js";
 
 const bcryptService = new BcryptService(bcrypt);
-const accountService = new AccountService(models.User, models.Follow, bcryptService, Op, SAFE_USER);
-const accountController = new AccountController(accountService);
+const accountService = new AccountService(
+    models.User,
+    models.Follow,
+    bcryptService,
+    chatService,
+    sequelize,
+    Op,
+    SAFE_USER
+);
+const accountController = new AccountController(accountService, sendEmail);
 
 const loader = {};
 
 loader.models = {
     User: models.User,
-    Follow: models.Follow
-}
+    Follow: models.Follow,
+};
 
 loader.services = {
     accountService,
@@ -26,19 +39,30 @@ loader.services = {
 };
 
 loader.controllers = {
-    accountController
-}
+    accountController,
+};
 
 loader.middlewares = {
-    isAuthenticated: isAuthenticated.bind(null, loader.services.accountService)
-}
+    isAuthenticated: isAuthenticated.bind(null, loader.services.accountService),
+};
 
 loader.validators = {
     accountChangeEmailValidator: accountChangeEmailValidator.bind(
         null,
-        accountService
+        accountService,
+        sendEmail
     ),
-    accountChangePasswordValidator: accountChangePasswordValidator.bind(null, accountService)
+    accountChangePasswordValidator: accountChangePasswordValidator.bind(
+        null,
+        accountService,
+        sendEmail
+    ),
+    updateBioValidator,
+    deleteAccountValidator: deleteAccountValidator.bind(
+        null,
+        accountService,
+        sendEmail
+    ),
 };
 
 export default loader;

@@ -46,14 +46,15 @@ export default async function signupValidator(service, req, res, next) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(fields.email)) {
         return res.status(400).send({
-            message: "Email format is invalid."
+            message: "Email format is invalid.",
         });
     }
 
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,18}$/;
     if (!passwordRegex.test(fields.password)) {
         return res.status(400).send({
-            message: "Password must be 8-18 characters and include both letters and numbers.",
+            message:
+                "Password must be 8-18 characters and include both letters and numbers.",
         });
     }
 
