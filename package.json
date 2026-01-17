@@ -1,5 +1,5 @@
 {
-    "name": "social-network",
+    "name": "lyncora",
     "version": "1.0.0",
     "main": "index.js",
     "directories": {
@@ -8,9 +8,7 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon index.js",
-        "build": "vite build",
-        "preview": "vite preview"
+        "dev": "nodemon index.js"
     },
     "keywords": [],
     "author": "",
@@ -32,8 +30,5 @@
         "swagger-ui-express": "^5.0.1",
         "uniqid": "^5.4.0",
         "yamljs": "^0.3.0"
-    },
-    "devDependencies": {
-        "vite": "^7.2.2"
     }
 }
