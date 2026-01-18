@@ -5,7 +5,7 @@ export class PostService {
         commentModel,
         postReactionModel,
         commentReactionModel,
-        SAFE_USER
+        SAFE_USER,
     ) {
         this.userModel = userModel;
         this.postModel = postModel;
@@ -21,7 +21,7 @@ export class PostService {
             title,
             description,
             authorId,
-            postImage,
+            postImage, 
             tags,
             location,
         });

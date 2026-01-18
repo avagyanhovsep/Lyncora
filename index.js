@@ -10,12 +10,12 @@ import { Server } from "socket.io";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 loadRoutes(app);
 
-app.use(express.static("public/uploads"));
+app.use("/uploads", express.static(path.resolve("public/uploads")));
 
 const openapiPath = path.resolve("./docs/openapi.yaml");
 const bundledSpec = await SwaggerParser.bundle(openapiPath);
@@ -23,11 +23,11 @@ const bundledSpec = await SwaggerParser.bundle(openapiPath);
 app.use("/api", swaggerUI.serve, swaggerUI.setup(bundledSpec));
 
 await models.sequelize.sync({ alter: true });
-
+ 
 const server = http.createServer(app);
 
 const io = new Server(server, {
-    cors: { origin: "http://localhost:5173", credentials: true },
+    cors: { origin: true, credentials: true },
 });
 
 io.use((socket, next) => {

@@ -43,10 +43,19 @@ export class AccountController {
     }
 
     async handleAvatarUpload(req, res) {
+        if (!req.file) {
+            return res
+                .status(400)
+                .send({ message: "Profile picture is required." });
+        }
+
         const user = await this.service.findUser({ id: req.user.id });
-        user.avatar = req.file.filename;
+
+        const avatarUrl = `/uploads/${req.file.filename}`; 
+        user.avatar = avatarUrl;
+
         await user.save();
-        return res.status(200).send({ picture: req.file.filename });
+        return res.status(200).send({ picture: avatarUrl });
     }
 
     async updateBio(req, res) {

@@ -26,14 +26,24 @@ const CreateNewPost = () => {
         register,
         handleSubmit,
         formState: { errors, isSubmitting, isDirty },
-        clearErrors,
         reset,
         setValue,
-    } = useForm<IPost>();
+        setError,
+        clearErrors,
+    } = useForm<IPost>({
+        defaultValues: {
+            title: "",
+            description: "",
+            location: "",
+            tags: [],
+        },
+        mode: "onSubmit",
+    });
 
     const postImageRef = useRef<HTMLInputElement | null>(null);
 
-    const [postImage, setPostImage] = useState<string>("");
+    const [postImageFile, setPostImageFile] = useState<File | null>(null);
+    const [postImagePreview, setPostImagePreview] = useState<string>("");
     const [tags, setTags] = useState<string[]>([]);
     const [tagInput, setTagInput] = useState<string>("");
 
@@ -71,77 +81,30 @@ const CreateNewPost = () => {
     };
 
     const canPublish = useMemo(
-        () => Boolean(postImage) && !isSubmitting,
-        [postImage, isSubmitting]
+        () => Boolean(postImageFile) && !isSubmitting,
+        [postImageFile, isSubmitting],
     );
-
-    const handleCreatePost: SubmitHandler<IPost> = async (postInformation) => {
-        try {
-            const response = await Axios.post<{ postInfo: IPost }>("/posts", {
-                postInformation: { ...postInformation, tags },
-                postImage,
-                tags,
-            });
-
-            setAccount({
-                ...account,
-                posts: [...account.posts, response.data.postInfo],
-            });
-
-            navigate(`/profile`);
-        } catch (e: unknown) {
-            if (axios.isAxiosError<ApiError>(e)) {
-                console.error(
-                    e.response?.data?.message ?? "Failed to create post."
-                );
-            } else {
-                console.error("Failed to create post.");
-            }
-        }
-    };
-
-    const handlePostImageUpload = async () => {
-        const file = postImageRef.current?.files?.[0];
-        if (!file) return;
-
-        const maxBytes = 15 * 1024 * 1024;
-        if (file.size > maxBytes) {
-            console.error("File too large (max 15MB).");
-            return;
-        }
-
-        const form = new FormData();
-        form.append("post-image", file);
-
-        try {
-            const response = await Axios.patch<{ picture: string }>(
-                "/posts/image",
-                form
-            );
-            setPostImage(response.data.picture);
-            clearErrors("postImage");
-        } catch (e: unknown) {
-            if (axios.isAxiosError<ApiError>(e)) {
-                console.error(e.response?.data?.message ?? "Upload failed.");
-            } else {
-                console.error("Upload failed.");
-            }
-        }
-    };
 
     const onReset = () => {
         reset();
         setTags([]);
         setTagInput("");
-        setPostImage("");
+
+        if (postImagePreview) URL.revokeObjectURL(postImagePreview);
+        setPostImagePreview("");
+        setPostImageFile(null);
+
         if (postImageRef.current) postImageRef.current.value = "";
+        clearErrors("postImage" as const);
     };
 
     const { ref: postImageReactHookRef, ...postImageRegister } = register(
         "postImage" as const,
         {
-            required: "Upload your post image...",
-        }
+            validate: () => {
+                return postImageFile ? true : "Upload your post image...";
+            },
+        },
     );
 
     useEffect(() => {
@@ -150,9 +113,73 @@ const CreateNewPost = () => {
 
     const leftText = isSubmitting
         ? "Publishing…"
-        : isDirty || postImage || tags.length
-        ? "Unsaved changes"
-        : "No changes";
+        : isDirty || postImagePreview || tags.length
+          ? "Unsaved changes"
+          : "No changes";
+
+    const fileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0] ?? null;
+        if (file) clearErrors("postImage" as const);
+
+        setPostImageFile(file);
+
+        if (postImagePreview) URL.revokeObjectURL(postImagePreview);
+
+        if (file) {
+            const preview = URL.createObjectURL(file);
+            setPostImagePreview(preview);
+        } else {
+            setPostImagePreview("");
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (postImagePreview) URL.revokeObjectURL(postImagePreview);
+        };
+    }, [postImagePreview]);
+
+    const handleCreatePost: SubmitHandler<IPost> = async (postInformation) => {
+        try {
+            if (!postImageFile) {
+                setError("postImage" as const, {
+                    type: "required",
+                    message: "Upload your post image...",
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("title", postInformation.title);
+            formData.append("description", postInformation.description ?? "");
+            formData.append("location", postInformation.location ?? "");
+            formData.append("tags", JSON.stringify(tags));
+            formData.append("postImage", postImageFile);
+
+            const response = await Axios.post<{ postInfo: IPost }>(
+                "/posts",
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                },
+            );
+
+            setAccount({
+                ...account,
+                posts: [...account.posts, response.data.postInfo],
+            });
+
+            navigate(-1);
+        } catch (e: unknown) {
+            if (axios.isAxiosError<ApiError>(e)) {
+                console.error(
+                    e.response?.data?.message ?? "Failed to create post.",
+                );
+            } else {
+                console.error("Failed to create post.");
+            }
+        }
+    };
 
     return (
         <div className="w-full h-full px-6 pb-20 lg:pb-10 py-10">
@@ -177,7 +204,13 @@ const CreateNewPost = () => {
                             >
                                 <TextInput
                                     id="title"
-                                    {...register("title")}
+                                    {...register("title", {
+                                        required: "Title is required.",
+                                        minLength: {
+                                            value: 2,
+                                            message: "Title is too short.",
+                                        },
+                                    })}
                                     placeholder="Give your post a catchy title"
                                 />
                             </FormField>
@@ -223,9 +256,11 @@ const CreateNewPost = () => {
                         subtitle="Upload at least one image to publish."
                     >
                         <MediaUploader
-                            errorText={errors.postImage?.message}
+                            errorText={
+                                errors.postImage?.message as string | undefined
+                            }
                             onPickFile={() => postImageRef.current?.click()}
-                            previewUrl={postImage}
+                            previewUrl={postImagePreview}
                             input={
                                 <input
                                     id="postImage"
@@ -236,7 +271,7 @@ const CreateNewPost = () => {
                                         postImageRef.current = el;
                                         postImageReactHookRef(el);
                                     }}
-                                    onChange={handlePostImageUpload}
+                                    onChange={fileSelected}
                                     className="hidden"
                                 />
                             }

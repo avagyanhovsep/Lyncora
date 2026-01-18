@@ -10,23 +10,31 @@ export class PostController {
     }
 
     async createNewPost(req, res) {
-        const {
-            postInformation: { title, description, location },
-            postImage,
-            tags,
-        } = req.body;
+        const { title, description, location } = req.body;
         const { id } = req.user;
 
+        let tags = [];
+        try {
+            tags = req.body.tags ? JSON.parse(req.body.tags) : [];
+        } catch {
+            tags = [];
+        }
+
+        const file = req.file;
+        if (!file) {
+            return res.status(400).send({ message: "Post image is required." });
+        }
+        const postImageUrl = `/uploads/${file.filename}`;
         const newPost = await this.service.createPost(
             title,
             description,
             id,
-            postImage,
+            postImageUrl,
             tags,
-            location
+            location,
         );
-        const postInfo = await this.service.findPost(newPost.id);
 
+        const postInfo = await this.service.findPost(newPost.id);
         return res.status(201).send({ postInfo });
     }
 
@@ -41,9 +49,9 @@ export class PostController {
         return res.status(200).send({ message: "Post deleted successfully" });
     }
 
-    async uploadPostImage(req, res) {
-        return res.status(200).send({ picture: req.file.filename });
-    }
+    // async uploadPostImage(req, res) {
+    //     return res.status(200).send({ picture: req.file.filename });
+    // }
 
     async like(req, res) {
         const { id } = req.user;
