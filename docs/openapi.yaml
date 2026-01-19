@@ -27,106 +27,7 @@ security:
     - bearerAuth: []
 
 components:
-    securitySchemes:
-        bearerAuth:
-            type: http
-            scheme: bearer
-            bearerFormat: JWT
-
-    schemas:
-        MessageResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-                    example: OK
-            required: [message]
-
-        ErrorResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-                    example: Missing/Invalid credentials...
-            required: [message]
-
-        UserSafe:
-            type: object
-            properties:
-                id:
-                    type: integer
-                    example: 113
-                firstName:
-                    type: string
-                    example: Hovsep
-                lastName:
-                    type: string
-                    example: Avagyan
-                username:
-                    type: string
-                    example: avagyanhovsep
-                email:
-                    type: string
-                    format: email
-                    example: hovsep@example.com
-                avatar:
-                    type: string
-                    example: "1735075012345.png"
-                bio:
-                    type: string
-                    example: ""
-                theme:
-                    type: string
-                    enum: [system, light, dark]
-                    example: system
-                isAccountPrivate:
-                    type: boolean
-                    example: false
-                isSigninAllowed:
-                    type: boolean
-                    example: true
-            required: [id, username, email, theme]
-
-    responses:
-        Unauthorized:
-            description: Unauthorized (missing or invalid token)
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/ErrorResponse"
-                    examples:
-                        unauthorized:
-                            value: { message: "Unauthorized" }
-
-        Forbidden:
-            description: Forbidden
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/ErrorResponse"
-                    examples:
-                        forbidden:
-                            value: { message: "Forbidden" }
-
-        NotFound:
-            description: Resource not found
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/ErrorResponse"
-                    examples:
-                        notFound:
-                            value: { message: "Not found" }
-
-        InternalServerError:
-            description: Internal server error
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/ErrorResponse"
-                    examples:
-                        serverError:
-                            value: { message: "Internal Server Error" }
+    $ref: ./components.yaml#/components
 
 paths:
     # ---------- AUTH ----------
@@ -178,20 +79,18 @@ paths:
     # ---------- POSTS ----------
     /posts:
         $ref: ../src/post/post.docs.yaml#/paths/~1posts
-    /posts/image:
-        $ref: ../src/post/post.docs.yaml#/paths/~1posts~1image
     /posts/{postId}:
         $ref: ../src/post/post.docs.yaml#/paths/~1posts~1{postId}
     /posts/{postId}/likes:
         $ref: ../src/post/post.docs.yaml#/paths/~1posts~1{postId}~1likes
 
-    # ---------- COMMENTS (nested) ----------
+    # ---------- COMMENTS ----------
     /posts/{postId}/comments:
-        $ref: ../src/comment/comment.docs.yaml#/paths/~1post~1{postId}~1comments
+        $ref: ../src/comment/comment.docs.yaml#/paths/~1posts~1{postId}~1comments
     /posts/{postId}/comments/{commentId}:
-        $ref: ../src/comment/comment.docs.yaml#/paths/~1post~1{postId}~1comments~1{commentId}
+        $ref: ../src/comment/comment.docs.yaml#/paths/~1posts~1{postId}~1comments~1{commentId}
     /posts/{postId}/comments/{commentId}/reactions:
-        $ref: ../src/comment/comment.docs.yaml#/paths/~1post~1{postId}~1comments~1{commentId}~1reactions
+        $ref: ../src/comment/comment.docs.yaml#/paths/~1posts~1{postId}~1comments~1{commentId}~1reactions
 
     # ---------- CHATS ----------
     /chats:

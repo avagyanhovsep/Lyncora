@@ -3,7 +3,7 @@ export default async function deleteAccountValidator(
     sendEmail,
     req,
     res,
-    next
+    next,
 ) {
     const { id } = req.user;
 
@@ -22,7 +22,7 @@ export default async function deleteAccountValidator(
         await sendEmail(
             deleted.email,
             "Your Lyncora account was deleted",
-            `Hi ${display},\n\nYour Lyncora account has been deleted successfully.\n\nIf you did not request this, please contact support.\n\n— Lyncora`
+            `Hi ${display},\n\nYour Lyncora account has been deleted successfully.\n\nIf you did not request this, please contact support.\n\n— Lyncora`,
         );
     }
 

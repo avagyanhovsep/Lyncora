@@ -2,10 +2,12 @@ import { useOutletContext } from "react-router-dom";
 import type { IRawFollowing, IContext } from "../../../types.ts";
 import { Axios } from "../../../api.ts";
 import { useEffect, useState } from "react";
+import NiceModal from "@ebay/nice-modal-react";
 import PageHeaderWithBadge from "./components/page-header-with-badge";
 import CardShell from "./components/card-shell";
 import EmptyStateCard from "./components/empty-state-card";
 import RequestRow from "./components/request-row";
+import ConfirmModal from "../components/confirm-modal.tsx";
 
 const Requests = () => {
     const { account, setAccount } = useOutletContext<IContext>();
@@ -16,26 +18,47 @@ const Requests = () => {
     }, [account.followers]);
 
     const handleAcceptRequest = (from: number, to: number) => {
-        Axios.patch(`/follow/requests/accept`, { from, to }).then(() => {
-            setAccount({
-                ...account,
-                followers: account.followers.map((follower) =>
-                    follower.from === from
-                        ? { ...follower, approved: true }
-                        : follower
-                ),
-            });
+        NiceModal.show(ConfirmModal, {
+            title: "Accept request?",
+            description:
+                "This person will be able to follow you and see your posts.",
+            confirmText: "Accept",
+            cancelText: "Cancel",
+            variant: "default",
+            onConfirm: async () => {
+                await Axios.patch(`/follow/requests/accept`, { from, to });
+            },
+            onSuccess: () => {
+                setAccount({
+                    ...account,
+                    followers: account.followers.map((follower) =>
+                        follower.from === from
+                            ? { ...follower, approved: true }
+                            : follower,
+                    ),
+                });
+            },
         });
     };
 
     const handleDeclineRequest = (from: number, to: number) => {
-        Axios.patch(`/follow/requests/decline`, { from, to }).then(() => {
-            setAccount({
-                ...account,
-                followers: account.followers.filter(
-                    (follower) => follower.from !== from
-                ),
-            });
+        NiceModal.show(ConfirmModal, {
+            title: "Decline request?",
+            description: "This request will be removed.",
+            confirmText: "Decline",
+            cancelText: "Cancel",
+            variant: "danger",
+            onConfirm: async () => {
+                await Axios.patch(`/follow/requests/decline`, { from, to });
+            },
+            onSuccess: () => {
+                setAccount({
+                    ...account,
+                    followers: account.followers.filter(
+                        (follower) => follower.from !== from,
+                    ),
+                });
+            },
         });
     };
 
@@ -63,13 +86,13 @@ const Requests = () => {
                                     onAccept={() =>
                                         handleAcceptRequest(
                                             request.from,
-                                            request.to
+                                            request.to,
                                         )
                                     }
                                     onDecline={() =>
                                         handleDeclineRequest(
                                             request.from,
-                                            request.to
+                                            request.to,
                                         )
                                     }
                                 />

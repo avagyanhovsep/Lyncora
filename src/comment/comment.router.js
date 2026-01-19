@@ -14,11 +14,11 @@ commentRouter.post("/", commentController.addComment);
 commentRouter.delete(
     "/:commentId",
     deleteCommentValidator,
-    commentController.deleteComment
+    commentController.deleteComment,
 );
 commentRouter.post(
     "/:commentId/reactions",
     reactValidator,
-    commentController.react
+    commentController.react,
 );
 commentRouter.get("/:commentId/reactions", commentController.getAllReactions);

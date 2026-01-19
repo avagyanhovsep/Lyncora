@@ -1,10 +1,5 @@
 export class PostController {
-    constructor(
-        service,
-        bucketName,
-        randomImageName,
-        attachImageToBucket,
-    ) {
+    constructor(service, bucketName, randomImageName, attachImageToBucket) {
         this.service = service;
 
         this.createNewPost = this.createNewPost.bind(this);

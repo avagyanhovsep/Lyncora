@@ -1,3 +1,5 @@
+import { Op } from "sequelize";
+
 export class ChatService {
     constructor(
         chatModel,
@@ -6,7 +8,7 @@ export class ChatService {
         messageModel,
         followModel,
         SAFE_USER,
-        sequelize
+        sequelize,
     ) {
         this.chatModel = chatModel;
         this.memberModel = memberModel;
@@ -19,8 +21,8 @@ export class ChatService {
 
     async getAllChats(userId) {
         const members = await this.memberModel.findAll({
-            where: { userId },
-            attributes: ["chatId", "lastReadAt"],
+            where: { userId, deletedAt: null },
+            attributes: ["chatId", "lastReadAt", "clearedAt"],
             include: [
                 {
                     model: this.chatModel,
@@ -79,9 +81,24 @@ export class ChatService {
         return !!member;
     }
 
-    async getUserMessages(chatId) {
+    async getUserMessages(chatId, userId) {
+        const cid = Number(chatId);
+
+        const member = await this.memberModel.findOne({
+            where: { chatId: cid, userId },
+            attributes: ["clearedAt"],
+        });
+
+        if (!member) return [];
+
+        const where = { chatId: cid };
+
+        if (member.clearedAt) {
+            where.createdAt = { [Op.gt]: member.clearedAt };
+        }
+
         return this.messageModel.findAll({
-            where: { chatId },
+            where,
             order: [["createdAt", "ASC"]],
             include: [
                 {
@@ -94,17 +111,44 @@ export class ChatService {
         });
     }
 
-    async createMessage(chatId, userId, text) {
+    async createMessage(chatId, senderId, text) {
         if (!text?.trim()) return null;
 
-        const sender = await this.userModel.findByPk(userId, {
-            attributes: ["id", "deletedAt"],
-            paranoid: false,
+        const cid = Number(chatId);
+
+        return this.sequelize.transaction(async (t) => {
+            const sender = await this.userModel.findByPk(senderId, {
+                attributes: ["id", "deletedAt"],
+                paranoid: false,
+                transaction: t,
+            });
+
+            if (!sender || sender.deletedAt) return null;
+
+            const members = await this.memberModel.findAll({
+                where: { chatId: cid },
+                attributes: ["userId"],
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+            });
+
+            const receiverId = members.find(
+                (member) => member.userId !== senderId,
+            )?.userId;
+            if (!receiverId) return null;
+
+            const message = await this.messageModel.create(
+                { chatId: cid, userId: senderId, text },
+                { transaction: t },
+            );
+
+            await this.memberModel.update(
+                { deletedAt: null },
+                { where: { chatId: cid, userId: receiverId }, transaction: t },
+            );
+
+            return message;
         });
-
-        if (!sender || sender.deletedAt) return null;
-
-        return this.messageModel.create({ chatId, userId, text });
     }
 
     async getChat(userId, partnerId) {
@@ -174,7 +218,7 @@ export class ChatService {
                     { chatId: chat.id, userId },
                     { chatId: chat.id, userId: partnerId },
                 ],
-                { transaction: t }
+                { transaction: t },
             );
 
             return this.chatModel.findByPk(chat.id, {
@@ -243,7 +287,7 @@ export class ChatService {
     async markChatRead(chatId, userId) {
         await this.memberModel.update(
             { lastReadAt: new Date() },
-            { where: { chatId, userId } }
+            { where: { chatId, userId } },
         );
     }
 
@@ -295,9 +339,23 @@ export class ChatService {
         });
     }
 
-    async deleteConversationForUser(chatId, userId) {
-        await this.memberModel.destroy({
-            where: { chatId, userId },
+    async deleteChatForUser(chatId, userId) {
+        const cid = Number(chatId);
+
+        return this.sequelize.transaction(async (t) => {
+            const member = await this.memberModel.findOne({
+                where: { chatId: cid, userId },
+                transaction: t,
+                lock: t.LOCK.UPDATE,
+            });
+
+            if (!member) return;
+
+            const now = new Date();
+            await member.update(
+                { deletedAt: now, clearedAt: now, lastReadAt: now },
+                { transaction: t },
+            );
         });
     }
 

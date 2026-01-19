@@ -14,12 +14,12 @@ followRouter.get("/requests", followController.getRequests);
 followRouter.patch(
     "/requests/accept",
     acceptRequestValidator,
-    followController.acceptRequest
+    followController.acceptRequest,
 );
 followRouter.patch(
     "/requests/decline",
     declineRequestValidator,
-    followController.declineRequest
+    followController.declineRequest,
 );
 followRouter.post("/followings", followController.getFollowings);
 followRouter.post("/followers", followController.getFollowers);

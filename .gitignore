@@ -11,6 +11,3 @@ build/
 # Env
 .env
 .env.*
-
-# Uploads (backend)
-public/uploads/

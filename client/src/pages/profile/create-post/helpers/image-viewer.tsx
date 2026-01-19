@@ -17,12 +17,12 @@ import LikeSection from "../components/like-section";
 type Props = {
     onClose: () => void;
     postId: number;
-    handleDeletePost?: () => void;
+    handleDeletePost?: (postId: number) => void;
 };
 
 const ImageViewer = ({ onClose, postId, handleDeletePost }: Props) => {
     const { data: postData } = useHttpGet<{ postInfo: IPost }>(
-        `/posts/${postId}`
+        `/posts/${postId}`,
     );
     const { register, handleSubmit, reset, watch } = useForm<IComment>();
     const { account } = useOutletContext<IContext>();
@@ -63,13 +63,13 @@ const ImageViewer = ({ onClose, postId, handleDeletePost }: Props) => {
 
     const handleDeleteComment = (commentId: number) => {
         setComments((prevComments) =>
-            prevComments.filter((comment) => comment.id !== commentId)
+            prevComments.filter((comment) => comment.id !== commentId),
         );
     };
 
     const handleAddReaction = () => {
         Axios.post<{ reactionStatus: boolean; reaction: IPostReaction }>(
-            `/posts/${postInfo.id}/likes`
+            `/posts/${postInfo.id}/likes`,
         ).then((response) => {
             setIsLiked(response.data.reactionStatus);
 
@@ -77,7 +77,7 @@ const ImageViewer = ({ onClose, postId, handleDeletePost }: Props) => {
                 setReactions((prev) => [...prev, response.data.reaction]);
             } else {
                 setReactions((prev) =>
-                    prev.filter((reaction) => reaction.userId !== account.id)
+                    prev.filter((reaction) => reaction.userId !== account.id),
                 );
             }
         });
@@ -146,8 +146,9 @@ const ImageViewer = ({ onClose, postId, handleDeletePost }: Props) => {
 
                             {postInfo.authorId == account.id && (
                                 <DeletePostBtn
-                                    handleDeletePost={handleDeletePost}
+                                    postId={postInfo.id}
                                     onClose={onClose}
+                                    handleDeletePost={handleDeletePost}
                                 />
                             )}
                         </div>

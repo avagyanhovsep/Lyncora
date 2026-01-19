@@ -37,7 +37,7 @@ export class CommentController {
 
         const commentReaction = await this.service.createCommentReaction(
             commentId,
-            id
+            id,
         );
 
         await commentReaction.reload({

@@ -11,9 +11,8 @@ export default async function sendMessageValidator(service, req, res, next) {
         const partnerId = members.find((m) => m.userId !== id)?.userId;
 
         if (partnerId) {
-            const partner = await service.findUserByIdIncludingDeleted(
-                partnerId
-            );
+            const partner =
+                await service.findUserByIdIncludingDeleted(partnerId);
             if (!partner || partner.deletedAt) {
                 return res.status(410).send({
                     message:
@@ -23,7 +22,7 @@ export default async function sendMessageValidator(service, req, res, next) {
 
             const isMessageAllowed = await service.canMessageUser(
                 id,
-                partnerId
+                partnerId,
             );
             if (!isMessageAllowed) {
                 return res.status(403).send({

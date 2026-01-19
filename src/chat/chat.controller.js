@@ -18,7 +18,9 @@ export class ChatController {
 
     async getMessages(req, res) {
         const { chatId } = req.params;
-        const messages = await this.chatService.getUserMessages(chatId);
+        const { id: userId } = req.user;
+
+        const messages = await this.chatService.getUserMessages(chatId, userId);
         return res.status(200).send({ messages });
     }
 
@@ -49,10 +51,10 @@ export class ChatController {
 
     async deleteChat(req, res) {
         const { chatId } = req.params;
-        const { id } = req.user;
+        const { id: userId } = req.user;
 
-        await this.chatService.deleteConversationForUser(chatId, id);
-        return res.status(200).send({ message: "Conversation deleted" });
+        await this.chatService.deleteChatForUser(chatId, userId);
+        return res.status(200).send({ message: "Chat hidden" });
     }
 
     async deleteMessage(req, res) {

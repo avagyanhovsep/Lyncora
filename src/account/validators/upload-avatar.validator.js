@@ -8,7 +8,7 @@ export default function uploadAvatarValidator(req, res, next) {
             .status(400)
             .json({ message: "Profile picture is required." });
     }
-    
+
     req.avatarUpload = {
         userId: req.user.id,
         buffer: req.file.buffer,

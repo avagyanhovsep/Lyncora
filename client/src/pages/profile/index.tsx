@@ -45,8 +45,6 @@ const Account = () => {
     };
 
     const handleDeletePost = async (postId: number) => {
-        await Axios.delete<{ message: string }>(`/posts/${postId}`);
-
         setAccount({
             ...account,
             posts: account.posts.filter((post) => post.id !== postId),

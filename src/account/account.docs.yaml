@@ -3,7 +3,7 @@ paths:
         patch:
             tags: [Account]
             summary: Toggle account privacy
-            description: Toggles the authenticated user's privacy flag (public/private).
+            description: Toggles `isAccountPrivate` for the authenticated user.
             security:
                 - bearerAuth: []
             responses:
@@ -15,22 +15,21 @@ paths:
                                 type: object
                                 properties:
                                     isAccountPrivate:
-                                        type: integer
-                                        description: 1 = private, 0 = public
-                                        example: 1
+                                        type: boolean
+                                        example: true
                                 required: [isAccountPrivate]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account/settings/email:
         patch:
             tags: [Account]
-            summary: Change account email
-            description: Changes the authenticated user's email after validating current password and email uniqueness. Sends notification emails to old and new email.
+            summary: Change my email
+            description: Changes the authenticated user's email after password verification, and sends notification emails to old/new address.
             security:
                 - bearerAuth: []
             requestBody:
@@ -42,11 +41,11 @@ paths:
                             properties:
                                 currentPasswordForEmail:
                                     type: string
-                                    example: "MyCurrentPassword123!"
+                                    example: "Password123"
                                 newEmail:
                                     type: string
                                     format: email
-                                    example: "new.email@example.com"
+                                    example: "newjohn@example.com"
                             required: [currentPasswordForEmail, newEmail]
             responses:
                 "200":
@@ -54,52 +53,52 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
-                                success:
+                                ok:
                                     value:
                                         message: "Email changed successfully!"
                 "400":
-                    description: Validation error (missing fields, password mismatch, email already used, etc.)
+                    description: Validation error (missing fields, wrong password, reused email, email already in use)
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 missing:
                                     value:
                                         message: "Missing/Invalid credentials..."
-                                bad_password:
+                                wrong_password:
                                     value:
                                         message: "Your password is incorrect, please provide correct one or change if you forgot"
-                                same_email:
+                                reused:
                                     value:
                                         message: "You already used this email previously, try another..."
                                 email_in_use:
                                     value:
                                         message: "This email is already in use, try another..."
-                "401":
-                    $ref: "#/components/responses/Unauthorized"
-                "403":
-                    $ref: "#/components/responses/Forbidden"
                 "404":
                     description: User not found
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 not_found:
                                     value:
                                         message: "User not found..."
+                "401":
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
+                "403":
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account/settings/password:
         patch:
             tags: [Account]
-            summary: Change account password
-            description: Changes the authenticated user's password after validating the current password. Sends a notification email.
+            summary: Change my password
+            description: Changes the authenticated user's password after verifying the current password, and emails a notification.
             security:
                 - bearerAuth: []
             requestBody:
@@ -111,10 +110,10 @@ paths:
                             properties:
                                 currentPasswordForPassword:
                                     type: string
-                                    example: "MyCurrentPassword123!"
+                                    example: "Password123"
                                 newPassword:
                                     type: string
-                                    example: "MyNewPassword123!"
+                                    example: "Newpass123"
                             required: [currentPasswordForPassword, newPassword]
             responses:
                 "200":
@@ -122,39 +121,47 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
-                                success:
+                                ok:
                                     value:
                                         message: "Your password has been changed successfully"
                 "400":
-                    description: Validation error (missing fields, wrong current password, new password equals old, etc.)
+                    description: Validation error (missing fields, wrong password, reused password)
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 missing:
                                     value:
                                         message: "Missing/Invalid credentials..."
-                                wrong_current:
+                                wrong_password:
                                     value:
                                         message: "Your current password is incorrect, try another or reset if you forgot"
-                                same_password:
+                                reused:
                                     value:
                                         message: "You have used this password previously, try another"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
+                "404":
+                    description: User not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account/avatar:
         patch:
             tags: [Account]
-            summary: Upload / update avatar
-            description: Uploads a new profile picture for the authenticated user. Expects multipart form upload under field name `profile-pic`.
+            summary: Upload / change my avatar
+            description: |
+                Uploads a new profile picture (multipart/form-data field name: `profile-pic`).
+                Requires auth. Validates file exists. Stores in S3 and returns `picture` URL.
             security:
                 - bearerAuth: []
             requestBody:
@@ -178,27 +185,30 @@ paths:
                                 properties:
                                     picture:
                                         type: string
-                                        description: Filename stored on server
-                                        example: "1735321123456-avatar.png"
+                                        example: "https://cdn.example.com/avatars/abc123.png"
                                 required: [picture]
                 "400":
-                    description: Bad request (file missing / invalid)
+                    description: Missing file
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                missing_file:
+                                    value:
+                                        message: "Profile picture is required."
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account/bio:
         patch:
             tags: [Account]
-            summary: Update bio
-            description: Updates the authenticated user's bio (max length 150).
+            summary: Update my bio
+            description: Updates bio for the authenticated user. Max length is 150 characters.
             security:
                 - bearerAuth: []
             requestBody:
@@ -210,8 +220,7 @@ paths:
                             properties:
                                 bio:
                                     type: string
-                                    maxLength: 150
-                                    example: "Building Lyncora and learning Node.js."
+                                    example: "Building Lyncora."
                             required: [bio]
             responses:
                 "200":
@@ -223,36 +232,33 @@ paths:
                                 properties:
                                     bio:
                                         type: string
+                                        example: "Building Lyncora."
                                     message:
                                         type: string
+                                        example: "Bio updated successfully!"
                                 required: [bio, message]
-                            examples:
-                                success:
-                                    value:
-                                        bio: "Building Lyncora and learning Node.js."
-                                        message: "Bio updated successfully!"
                 "400":
                     description: Bio too long
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 too_long:
                                     value:
                                         message: "Bio too long"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account/theme:
         patch:
             tags: [Account]
-            summary: Update theme
-            description: Updates the authenticated user's theme setting.
+            summary: Update my theme
+            description: Updates theme for the authenticated user.
             security:
                 - bearerAuth: []
             requestBody:
@@ -264,7 +270,8 @@ paths:
                             properties:
                                 theme:
                                     type: string
-                                    description: Theme value saved on the user record (you define allowed values).
+                                    description: Theme preference
+                                    enum: [system, light, dark]
                                     example: "dark"
                             required: [theme]
             responses:
@@ -277,29 +284,23 @@ paths:
                                 properties:
                                     theme:
                                         type: string
+                                        enum: [system, light, dark]
+                                        example: "dark"
                                 required: [theme]
-                            examples:
-                                success:
-                                    value:
-                                        theme: "dark"
-                "400":
-                    description: Invalid theme payload
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/MessageResponse"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account:
         delete:
             tags: [Account]
-            summary: Delete account
-            description: Deletes the authenticated user's account (transactional). Cleans up related chats. Sends a deletion confirmation email if the user had an email.
+            summary: Delete my account
+            description: |
+                Deletes the authenticated user's account (transaction). Also cleans up chats and follow rows.
+                Sends a confirmation email if an email exists.
             security:
                 - bearerAuth: []
             responses:
@@ -308,33 +309,33 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
-                                success:
+                                ok:
                                     value:
                                         message: "Account deleted"
-                "401":
-                    $ref: "#/components/responses/Unauthorized"
-                "403":
-                    $ref: "#/components/responses/Forbidden"
                 "404":
                     description: User not found
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 not_found:
                                     value:
                                         message: "User not found"
+                "401":
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
+                "403":
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account/search/{text}:
         get:
             tags: [Account]
-            summary: Search users
-            description: Returns a list of users whose firstName starts with the provided text.
+            summary: Search users by first name prefix
+            description: Returns users whose `firstName` starts with `{text}`.
             security:
                 - bearerAuth: []
             parameters:
@@ -343,7 +344,7 @@ paths:
                   required: true
                   schema:
                       type: string
-                  example: "Ho"
+                      example: "jo"
             responses:
                 "200":
                     description: Users returned
@@ -355,20 +356,20 @@ paths:
                                     users:
                                         type: array
                                         items:
-                                            $ref: "#/components/schemas/UserSafe"
+                                            $ref: "../../docs/components.yaml#/components/schemas/UserSafe"
                                 required: [users]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /account/{username}:
         get:
             tags: [Account]
-            summary: Get user info by username
-            description: Returns a user profile by username. Includes followings, followers and posts (per your service include).
+            summary: Get user profile by username
+            description: Returns user profile (includes followings, followers, posts). Includes password internally in service but should not be exposed in docs.
             security:
                 - bearerAuth: []
             parameters:
@@ -377,7 +378,7 @@ paths:
                   required: true
                   schema:
                       type: string
-                  example: "avagyanhovsep"
+                      example: "john_doe"
             responses:
                 "200":
                     description: User returned
@@ -387,139 +388,21 @@ paths:
                                 type: object
                                 properties:
                                     user:
-                                        $ref: "#/components/schemas/UserProfile"
+                                        $ref: "../../docs/components.yaml#/components/schemas/UserProfile"
                                 required: [user]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "404":
                     description: User not found
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                not_found:
+                                    value:
+                                        message: "User not found..."
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
-
-components:
-    schemas:
-        MessageResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-            required: [message]
-
-        UserSafe:
-            type: object
-            description: Safe user fields (based on SAFE_USER constant in your codebase).
-            properties:
-                id:
-                    type: integer
-                    example: 113
-                username:
-                    type: string
-                    example: "avagyanhovsep"
-                firstName:
-                    type: string
-                    example: "Hovsep"
-                lastName:
-                    type: string
-                    example: "Avagyan"
-                avatar:
-                    type: string
-                    nullable: true
-                    example: "1735321123456-avatar.png"
-                bio:
-                    type: string
-                    nullable: true
-                    example: "Building Lyncora."
-                theme:
-                    type: string
-                    nullable: true
-                    example: "dark"
-                isAccountPrivate:
-                    type: integer
-                    example: 0
-
-        FollowEdge:
-            type: object
-            properties:
-                id:
-                    type: integer
-                senderId:
-                    type: integer
-                receiverId:
-                    type: integer
-                sender:
-                    $ref: "#/components/schemas/UserSafe"
-                receiver:
-                    $ref: "#/components/schemas/UserSafe"
-
-        UserProfile:
-            allOf:
-                - $ref: "#/components/schemas/UserSafe"
-                - type: object
-                  properties:
-                      followings:
-                          type: array
-                          items:
-                              type: object
-                              properties:
-                                  receiver:
-                                      $ref: "#/components/schemas/UserSafe"
-                      followers:
-                          type: array
-                          items:
-                              type: object
-                              properties:
-                                  sender:
-                                      $ref: "#/components/schemas/UserSafe"
-                      posts:
-                          type: array
-                          items:
-                              type: object
-                              description: Post schema reference placeholder (replace with your actual Post schema if you have one).
-                              properties:
-                                  id:
-                                      type: integer
-                                  text:
-                                      type: string
-                                  createdAt:
-                                      type: string
-                                      format: date-time
-
-    responses:
-        Unauthorized:
-            description: Missing/invalid auth token
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        unauthorized:
-                            value:
-                                message: "Unauthorized"
-
-        Forbidden:
-            description: Authenticated but not allowed
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        forbidden:
-                            value:
-                                message: "Forbidden"
-
-        InternalServerError:
-            description: Server error
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        error:
-                            value:
-                                message: "Internal server error"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"

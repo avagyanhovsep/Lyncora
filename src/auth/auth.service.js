@@ -5,7 +5,7 @@ export class AuthService {
         bcryptService,
         jwtService,
         cryptoService,
-        SAFE_USER
+        SAFE_USER,
     ) {
         this.userModel = userModel;
         this.followModel = followModel;

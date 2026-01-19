@@ -19,7 +19,7 @@ export const chatService = new ChatService(
     models.Message,
     models.Follow,
     SAFE_USER,
-    sequelize
+    sequelize,
 );
 const chatController = new ChatController(chatService);
 

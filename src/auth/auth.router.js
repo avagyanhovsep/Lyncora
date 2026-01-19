@@ -18,19 +18,19 @@ const {
 authRouter.post(
     "/signup",
     [signupValidator, signupPipe],
-    authController.signup
+    authController.signup,
 );
 authRouter.post("/signin", signinValidator, authController.signin);
 authRouter.post("/verify", verifyValidator, authController.verify);
 authRouter.post(
     "/forgot-password",
     forgotPasswordValidator,
-    authController.forgotPassword
+    authController.forgotPassword,
 );
 authRouter.post(
     "/reset-password",
     resetPasswordValidator,
-    authController.resetPassword
+    authController.resetPassword,
 );
 
 authRouter.get("/user", isAuthenticated, authController.getUser);

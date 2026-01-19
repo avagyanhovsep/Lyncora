@@ -1,18 +1,22 @@
 import express from "express";
 import init from "./post.provider.js";
-import { upload } from "../../lib/upload.js";
 
 export const postRouter = express.Router();
 
 const { postController } = init.controllers;
 const { isAuthenticated } = init.middlewares;
-const { deletePostValidator, likeValidator, createPostValidator } = init.validators;
+const {
+    deletePostValidator,
+    likeValidator,
+    createPostValidator,
+    uploadPostImageValidator,
+} = init.validators;
 
 postRouter.use(isAuthenticated);
 
 postRouter.post(
     "/",
-    [upload.single("postImage"), createPostValidator],
+    [uploadPostImageValidator, createPostValidator],
     postController.createNewPost,
 );
 postRouter.post("/:postId/likes", likeValidator, postController.like);

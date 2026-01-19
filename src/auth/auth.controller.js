@@ -17,13 +17,13 @@ export class AuthController {
             lastName,
             username,
             email,
-            password
+            password,
         );
 
         void this.sendEmail(
             email,
             "Welcome to Lyncora",
-            `Welcome to Lyncora. \n\nYour account has been successfully created, and you’re all set to get started. \n\nThank you for joining us.`
+            `Welcome to Lyncora. \n\nYour account has been successfully created, and you’re all set to get started. \n\nThank you for joining us.`,
         );
 
         return res

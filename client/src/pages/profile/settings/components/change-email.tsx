@@ -1,11 +1,14 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
+import NiceModal from "@ebay/nice-modal-react";
 import { Axios } from "../../../../api";
 import LockIcon from "../../../../utils/icons/lock-icon-icon";
 import OpenEyeIcon from "../../../../utils/icons/open-eye-icon";
 import CloseEyeIcon from "../../../../utils/icons/close-eye-icon";
 import EnvelopeIcon from "../../../../utils/icons/envelope-icon";
+import ConfirmModal from "../../components/confirm-modal";
+
 interface IChangeEmailForm {
     currentPasswordForEmail: string;
     newEmail: string;
@@ -25,7 +28,7 @@ const ChangeEmail = () => {
         reset,
     } = useForm<IChangeEmailForm>();
 
-    const changeEmail: SubmitHandler<IChangeEmailForm> = async (user) => {
+    const changeEmailConfirmed = async (user: IChangeEmailForm) => {
         try {
             const token = sessionStorage.getItem("token");
             const response = await Axios.patch("/account/settings/email", {
@@ -35,19 +38,42 @@ const ChangeEmail = () => {
 
             setErrMessage("");
             setMessage(
-                (response.data as { message?: string })?.message ?? "Updated."
+                (response.data as { message?: string })?.message ?? "Updated.",
             );
             reset();
         } catch (e: unknown) {
             setMessage("");
             if (axios.isAxiosError<ApiError>(e)) {
                 setErrMessage(
-                    e.response?.data?.message ?? "Email update failed."
+                    e.response?.data?.message ?? "Email update failed.",
                 );
             } else {
                 setErrMessage("Email update failed.");
             }
+            throw e;
         }
+    };
+
+    const onSubmit: SubmitHandler<IChangeEmailForm> = (user) => {
+        setErrMessage("");
+        setMessage("");
+
+        NiceModal.show(ConfirmModal, {
+            title: "Change email?",
+            description: "You may need to verify this email after updating.",
+            confirmText: "Change email",
+            cancelText: "Cancel",
+            variant: "default",
+            content: (
+                <div className="rounded-xl bg-slate-50 ring-1 ring-slate-200/70 p-3 text-xs text-slate-700 dark:bg-white/5 dark:ring-white/10 dark:text-slate-200">
+                    New email:{" "}
+                    <span className="font-semibold">{user.newEmail}</span>
+                </div>
+            ),
+            onConfirm: async () => {
+                await changeEmailConfirmed(user);
+            },
+        });
     };
 
     return (
@@ -71,10 +97,7 @@ const ChangeEmail = () => {
                 </p>
             )}
 
-            <form
-                className="mt-4 space-y-4"
-                onSubmit={handleSubmit(changeEmail)}
-            >
+            <form className="mt-4 space-y-4" onSubmit={handleSubmit(onSubmit)}>
                 <div className="relative">
                     <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <LockIcon className="w-5 h-5 stroke-slate-400" />

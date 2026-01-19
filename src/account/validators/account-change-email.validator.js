@@ -3,7 +3,7 @@ export default async function accountChangeEmailValidator(
     sendEmail,
     req,
     res,
-    next
+    next,
 ) {
     const { currentPasswordForEmail, newEmail } = req.body;
     const { email } = req.user;
@@ -21,7 +21,7 @@ export default async function accountChangeEmailValidator(
 
     const passwordMatches = await service.checkPassword(
         currentPasswordForEmail,
-        user.password
+        user.password,
     );
 
     if (!passwordMatches) {
@@ -52,13 +52,13 @@ export default async function accountChangeEmailValidator(
     void sendEmail(
         oldEmail,
         "Your Lyncora email was changed",
-        `Your Lyncora account email was changed from ${oldEmail} to ${newEmail}. \n\nIf you did not make this change, please reset your password immediately and contact support.`
+        `Your Lyncora account email was changed from ${oldEmail} to ${newEmail}. \n\nIf you did not make this change, please reset your password immediately and contact support.`,
     );
 
     void sendEmail(
         newEmail,
         "Your email is now linked to your Lyncora account",
-        `This email address (${newEmail}) has been added to your Lyncora account. \n\nIf you did not request this, please contact support.`
+        `This email address (${newEmail}) has been added to your Lyncora account. \n\nIf you did not request this, please contact support.`,
     );
 
     return next();

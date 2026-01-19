@@ -3,7 +3,7 @@ export default async function resetPasswordValidator(
     sendEmail,
     req,
     res,
-    next
+    next,
 ) {
     const { password, email } = req.body;
     if (!password?.trim()) {
@@ -34,7 +34,7 @@ export default async function resetPasswordValidator(
     void sendEmail(
         user.email,
         "Your Lyncora password was changed",
-        "Your password has been changed successfully. \n\nIf you did not make this change, please reset your password immediately and contact support."
+        "Your password has been changed successfully. \n\nIf you did not make this change, please reset your password immediately and contact support.",
     );
 
     return next();

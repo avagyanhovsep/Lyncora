@@ -1,10 +1,12 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
+import NiceModal from "@ebay/nice-modal-react";
 import { Axios } from "../../../../api";
 import LockIcon from "../../../../utils/icons/lock-icon-icon";
 import OpenEyeIcon from "../../../../utils/icons/open-eye-icon";
 import CloseEyeIcon from "../../../../utils/icons/close-eye-icon";
+import ConfirmModal from "../../components/confirm-modal";
 
 interface IChangePasswordForm {
     currentPasswordForPassword: string;
@@ -26,27 +28,44 @@ const ChangePassword = () => {
         reset,
     } = useForm<IChangePasswordForm>();
 
-    const changePassword: SubmitHandler<IChangePasswordForm> = async (data) => {
+    const changePasswordConfirmed = async (data: IChangePasswordForm) => {
         try {
             const response = await Axios.patch(
                 "/account/settings/password",
-                data
+                data,
             );
             setErrMessage("");
             setMessage(
-                (response.data as { message?: string })?.message ?? "Updated."
+                (response.data as { message?: string })?.message ?? "Updated.",
             );
             reset();
         } catch (e: unknown) {
             setMessage("");
             if (axios.isAxiosError<ApiError>(e)) {
                 setErrMessage(
-                    e.response?.data?.message ?? "Password update failed."
+                    e.response?.data?.message ?? "Password update failed.",
                 );
             } else {
                 setErrMessage("Password update failed.");
             }
+            throw e;
         }
+    };
+
+    const onSubmit: SubmitHandler<IChangePasswordForm> = (data) => {
+        setErrMessage("");
+        setMessage("");
+
+        NiceModal.show(ConfirmModal, {
+            title: "Change password?",
+            description: "You may be signed out on other devices.",
+            confirmText: "Change password",
+            cancelText: "Cancel",
+            variant: "default",
+            onConfirm: async () => {
+                await changePasswordConfirmed(data);
+            },
+        });
     };
 
     return (
@@ -70,10 +89,7 @@ const ChangePassword = () => {
                 </p>
             )}
 
-            <form
-                className="mt-4 space-y-4"
-                onSubmit={handleSubmit(changePassword)}
-            >
+            <form className="mt-4 space-y-4" onSubmit={handleSubmit(onSubmit)}>
                 <div className="relative">
                     <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <LockIcon className="w-5 h-5 stroke-slate-400" />

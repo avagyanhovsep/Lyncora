@@ -201,13 +201,13 @@ const UserProfile = () => {
                                 />
                             </div>
 
-                            <div className="mt-5 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70 dark:bg-black/25 dark:ring-white/10">
-                                <p className="text-sm text-slate-700 leading-relaxed dark:text-slate-300">
-                                    {userInfo.bio?.trim()
-                                        ? userInfo.bio
-                                        : "No bio yet."}
-                                </p>
-                            </div>
+                            {userInfo.bio?.trim() && (
+                                <div className="mt-5 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70 dark:bg-black/25 dark:ring-white/10">
+                                    <p className="text-sm text-slate-700 leading-relaxed dark:text-slate-300">
+                                        {userInfo.bio}
+                                    </p>
+                                </div>
+                            )}
 
                             {showPrivateBadge && (
                                 <div className="mt-4 rounded-2xl bg-slate-50 ring-1 ring-slate-200/70 p-4 dark:bg-white/5 dark:ring-white/10">

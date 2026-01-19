@@ -11,7 +11,7 @@ const commentService = new CommentService(
     models.User,
     models.Comment,
     models.CommentReaction,
-    SAFE_USER
+    SAFE_USER,
 );
 const commentController = new CommentController(commentService, models.User);
 
@@ -33,7 +33,7 @@ loader.middlewares = {
 loader.validators = {
     deleteCommentValidator: deleteCommentValidator.bind(
         null,
-        loader.services.commentService
+        loader.services.commentService,
     ),
     reactValidator: reactValidator.bind(null, loader.services.commentService),
 };

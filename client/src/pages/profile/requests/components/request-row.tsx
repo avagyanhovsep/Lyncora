@@ -40,6 +40,7 @@ export default function RequestRow({ request, onAccept, onDecline }: Props) {
                 <button
                     onClick={onAccept}
                     className="rounded-md bg-green-700 px-5 py-2 text-sm font-medium text-white hover:bg-green-600 active:scale-95 transition"
+                    type="button"
                 >
                     Accept
                 </button>
@@ -47,6 +48,7 @@ export default function RequestRow({ request, onAccept, onDecline }: Props) {
                 <button
                     onClick={onDecline}
                     className="rounded-md bg-red-700 px-5 py-2 text-sm font-medium text-white hover:bg-red-600 active:scale-95 transition"
+                    type="button"
                 >
                     Decline
                 </button>

@@ -1,5 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import NiceModal from "@ebay/nice-modal-react";
 import SettingsIcon from "../../../../utils/icons/settings-icon";
+import ConfirmModal from "../../components/confirm-modal";
 
 interface SettingModalProps {
     open: boolean;
@@ -10,9 +12,19 @@ const SettingModal = ({ open, onClose }: SettingModalProps) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        sessionStorage.removeItem("token");
-        navigate("/");
-        onClose();
+        NiceModal.show(ConfirmModal, {
+            title: "Log out?",
+            description:
+                "Signing out will remove this account from the device.",
+            confirmText: "Log out",
+            cancelText: "Cancel",
+            variant: "danger",
+            onConfirm: async () => {
+                sessionStorage.removeItem("token");
+                navigate("/");
+                onClose();
+            },
+        });
     };
 
     return (

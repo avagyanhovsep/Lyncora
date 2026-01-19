@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import NiceModal from "@ebay/nice-modal-react";
 import type { IComment, ICommentReaction, IContext } from "../../../../types";
-import CommentMoreModal from "./comment-more-modal";
 import { Axios } from "../../../../api";
 import TimeAgo from "../../components/time-ago";
 import MoreIcon from "../../../../utils/icons/more-icon";
 import HeartIcon from "../../../../utils/icons/heart-icon";
+import ConfirmModal from "../../components/confirm-modal";
 
 const SingleComment = ({
     comment,
     commentCreated,
     handleDeleteComment,
+    postId, 
 }: {
+    postId: number; 
     comment: IComment;
     commentCreated: string;
     handleDeleteComment: (commentId: number) => void;
@@ -28,7 +30,7 @@ const SingleComment = ({
 
         if (!comment.reactions) return;
         const reacted = comment.reactions.some(
-            (comReaction) => comReaction.userId === account.id
+            (comReaction) => comReaction.userId === account.id,
         );
         setIsLiked(reacted);
     }, [comment.reactions, account.id]);
@@ -37,7 +39,7 @@ const SingleComment = ({
         Axios.post<{
             commentReactionStatus: boolean;
             commentReaction: ICommentReaction;
-        }>(`/posts/${comment.id}/comments/${comment.id}/reactions`).then(
+        }>(`/posts/${postId}/comments/${comment.id}/reactions`).then(
             (response) => {
                 setIsLiked(response.data.commentReactionStatus);
 
@@ -51,17 +53,28 @@ const SingleComment = ({
                     ]);
                 } else {
                     setCommentReactions((prev) =>
-                        prev.filter((r) => r.userId !== account.id)
+                        prev.filter((r) => r.userId !== account.id),
                     );
                 }
-            }
+            },
         );
     };
 
     const handleMoreClick = () => {
-        NiceModal.show(CommentMoreModal, {
-            commentId: comment.id,
-            onDeleted: handleDeleteComment,
+        NiceModal.show(ConfirmModal, {
+            title: "Delete comment?",
+            description: "This action can’t be undone.",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            variant: "danger",
+
+            onConfirm: async () => {
+                await Axios.delete(`/posts/${postId}/comments/${comment.id}`);
+            },
+
+            onSuccess: () => {
+                handleDeleteComment(comment.id);
+            },
         });
     };
 
@@ -94,11 +107,11 @@ const SingleComment = ({
                             <MoreIcon
                                 onClick={handleMoreClick}
                                 className="
-                                    duration-200 cursor-pointer
-                                    invisible opacity-0 group-hover:visible group-hover:opacity-100
-                                    fill-slate-500 hover:fill-slate-700
-                                    dark:fill-neutral-400 dark:hover:fill-neutral-200
-                                "
+                  duration-200 cursor-pointer
+                  invisible opacity-0 group-hover:visible group-hover:opacity-100
+                  fill-slate-500 hover:fill-slate-700
+                  dark:fill-neutral-400 dark:hover:fill-neutral-200
+                "
                             />
                         )}
                     </div>

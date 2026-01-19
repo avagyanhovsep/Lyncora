@@ -8,6 +8,7 @@ import SwaggerParser from "@apidevtools/swagger-parser";
 import models from "./config/database/index.js";
 import http from "http";
 import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
 
 const app = express();
 
@@ -32,8 +33,13 @@ app.use("/api", swaggerUI.serve, swaggerUI.setup(bundledSpec));
 //   res.sendFile(path.join(CLIENT_DIST_PATH, "index.html"));
 // });
 
-await models.sequelize.sync({ alter: true });
- 
+const isProd = process.env.NODE_ENV === "production";
+await models.sequelize.authenticate();
+
+if (!isProd) {
+    await models.sequelize.sync({ alter: true });
+}
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -106,5 +112,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(4002, () =>
-    console.log("Server started on http://localhost:4002")
+    console.log("Server started on http://localhost:4002"),
 );

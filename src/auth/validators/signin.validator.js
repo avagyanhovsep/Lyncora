@@ -3,7 +3,7 @@ export default async function signinValidator(
     sendEmail,
     req,
     res,
-    next
+    next,
 ) {
     const { email, password } = req.body;
 
@@ -20,7 +20,7 @@ export default async function signinValidator(
 
     const isPasswordCorrect = await service.checkPassword(
         password,
-        user.password
+        user.password,
     );
 
     if (!isPasswordCorrect) {
@@ -33,7 +33,7 @@ export default async function signinValidator(
         void sendEmail(
             user.email,
             "Your Lyncora verification code",
-            `Your verification code is ${otp}. \n\nIt expires in 2 minutes. If you did not request this, you can ignore this email.`
+            `Your verification code is ${otp}. \n\nIt expires in 2 minutes. If you did not request this, you can ignore this email.`,
         );
     }
 

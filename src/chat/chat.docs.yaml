@@ -1,9 +1,9 @@
 paths:
     /chats:
         get:
-            tags: [Chat]
+            tags: [Chats]
             summary: Load my chats
-            description: Returns all chats for the authenticated user, including members (with SAFE_USER fields) and the last message (latest).
+            description: Returns all chats for the authenticated user, including members (SAFE_USER fields) and the latest message (limit 1) per chat.
             security:
                 - bearerAuth: []
             responses:
@@ -17,18 +17,20 @@ paths:
                                     chats:
                                         type: array
                                         items:
-                                            $ref: "#/components/schemas/Chat"
+                                            $ref: "../../docs/components.yaml#/components/schemas/Chat"
                                 required: [chats]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
+                "500":
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /chats/dm:
         post:
-            tags: [Chat]
+            tags: [Chats]
             summary: Create or load a DM chat with a partner
-            description: Finds an existing 1:1 chat between the authenticated user and partner; otherwise creates a new one and returns it.
+            description: Finds an existing 1:1 chat between the authenticated user and partner; otherwise creates a new one and returns it. Enforces private-account messaging rules.
             security:
                 - bearerAuth: []
             requestBody:
@@ -36,7 +38,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/CreateDMRequest"
+                            $ref: "../../docs/components.yaml#/components/schemas/CreateDMRequest"
             responses:
                 "200":
                     description: Chat loaded/created
@@ -46,31 +48,45 @@ paths:
                                 type: object
                                 properties:
                                     chat:
-                                        $ref: "#/components/schemas/Chat"
+                                        $ref: "../../docs/components.yaml#/components/schemas/Chat"
                                 required: [chat]
                 "400":
                     description: Missing/invalid partnerId, or attempting to DM yourself
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                invalid:
+                                    value:
+                                        message: "Missing/Invalid ID..."
+                                self:
+                                    value:
+                                        message: "Cannot DM yourself..."
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    description: Partner account is private and messaging is not allowed (must follow/approved)
+                    description: Partner account is private and messaging is not allowed
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                private:
+                                    value:
+                                        message: "This account is private, follow to message..."
+                "500":
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /chats/{chatId}/messages:
         get:
-            tags: [Chat]
+            tags: [Chats]
             summary: Get messages for a chat
+            description: Returns messages for the chat if the authenticated user is a member. If the member has cleared the chat, only returns messages after clearedAt.
             security:
                 - bearerAuth: []
             parameters:
-                - $ref: "#/components/parameters/ChatIdParam"
+                - $ref: "../../docs/components.yaml#/components/parameters/ChatIdParam"
             responses:
                 "200":
                     description: Messages returned
@@ -82,31 +98,37 @@ paths:
                                     messages:
                                         type: array
                                         items:
-                                            $ref: "#/components/schemas/Message"
+                                            $ref: "../../docs/components.yaml#/components/schemas/ChatMessage"
                                 required: [messages]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
                     description: Not a member of this chat
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                forbidden:
+                                    value:
+                                        message: "Forbidden"
+                "500":
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
         post:
-            tags: [Chat]
+            tags: [Chats]
             summary: Send a message in a chat
-            description: Creates a new message in the chat. May be blocked if the partner deleted their account or privacy rules disallow messaging.
+            description: Creates a new message in the chat. Blocks if partner deleted their account or privacy rules disallow messaging.
             security:
                 - bearerAuth: []
             parameters:
-                - $ref: "#/components/parameters/ChatIdParam"
+                - $ref: "../../docs/components.yaml#/components/parameters/ChatIdParam"
             requestBody:
                 required: true
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/SendMessageRequest"
+                            $ref: "../../docs/components.yaml#/components/schemas/SendMessageRequest"
             responses:
                 "201":
                     description: Message created
@@ -116,68 +138,91 @@ paths:
                                 type: object
                                 properties:
                                     message:
-                                        $ref: "#/components/schemas/Message"
+                                        $ref: "../../docs/components.yaml#/components/schemas/ChatMessage"
                                 required: [message]
                 "400":
-                    description: Missing/invalid text
+                    description: Missing/invalid message text (if service returns null or upstream validation fails)
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                invalid:
+                                    value:
+                                        message: "Missing/Invalid credentials..."
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
                     description: Not a member, or messaging not allowed due to private-account rules
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                forbidden:
+                                    value:
+                                        message: "Forbidden"
+                                private:
+                                    value:
+                                        message: "Sending message is not allowed, follow to message..."
                 "410":
                     description: Partner deleted their account; you cannot send new messages
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                gone:
+                                    value:
+                                        message: "This user deleted their account. You can’t send new messages."
+                "500":
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /chats/{chatId}/read:
         post:
-            tags: [Chat]
+            tags: [Chats]
             summary: Mark chat as read
             description: Updates the member lastReadAt timestamp for the authenticated user in this chat.
             security:
                 - bearerAuth: []
             parameters:
-                - $ref: "#/components/parameters/ChatIdParam"
+                - $ref: "../../docs/components.yaml#/components/parameters/ChatIdParam"
             responses:
                 "200":
                     description: Chat marked as read
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 ok:
                                     value:
                                         message: "Message read!"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
                     description: Not a member of this chat
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                forbidden:
+                                    value:
+                                        message: "Forbidden"
+                "500":
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /chats/{chatId}/messages/{messageId}:
         delete:
-            tags: [Chat]
+            tags: [Chats]
             summary: Unsend (delete) one of my messages
-            description: Soft-deletes the message (paranoid). Only the sender can unsend their message.
+            description: Soft-deletes the message (paranoid). Only the sender can unsend their message. Must be a chat member.
             security:
                 - bearerAuth: []
             parameters:
-                - $ref: "#/components/parameters/ChatIdParam"
-                - $ref: "#/components/parameters/MessageIdParam"
+                - $ref: "../../docs/components.yaml#/components/parameters/ChatIdParam"
+                - $ref: "../../docs/components.yaml#/components/parameters/MessageIdParam"
             responses:
                 "200":
                     description: Message deleted
@@ -188,188 +233,67 @@ paths:
                                 properties:
                                     messageId:
                                         type: integer
-                                        example: 123
+                                        example: 55
                                 required: [messageId]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
                     description: Not a member, or you can unsend only your own messages
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                forbidden:
+                                    value:
+                                        message: "Forbidden"
+                                not_owner:
+                                    value:
+                                        message: "You can unsend only your messages"
                 "404":
                     description: Message not found in this chat
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                not_found:
+                                    value:
+                                        message: "Message not found"
+                "500":
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /chats/{chatId}:
         delete:
-            tags: [Chat]
+            tags: [Chats]
             summary: Delete conversation for me
-            description: Removes the authenticated user from the chat (deletes Member row). If the last member leaves, chat is auto-deleted by hook.
+            description: Hides the chat for the authenticated user by setting Member.deletedAt/clearedAt/lastReadAt to now. (Chat may be auto-deleted if last member leaves via hooks.)
             security:
                 - bearerAuth: []
             parameters:
-                - $ref: "#/components/parameters/ChatIdParam"
+                - $ref: "../../docs/components.yaml#/components/parameters/ChatIdParam"
             responses:
                 "200":
-                    description: Conversation deleted for user
+                    description: Conversation hidden for user
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 ok:
                                     value:
-                                        message: "Conversation deleted"
+                                        message: "Chat hidden"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
                     description: Not a member of this chat
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ErrorResponse"
-
-components:
-    responses:
-        Unauthorized:
-            description: Missing or invalid authentication token
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/ErrorResponse"
-                    examples:
-                        unauthorized:
-                            value:
-                                message: "Unauthorized"
-
-        Forbidden:
-            description: Authenticated but not allowed to access this resource
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/ErrorResponse"
-                    examples:
-                        forbidden:
-                            value:
-                                message: "Forbidden"
-
-    parameters:
-        ChatIdParam:
-            name: chatId
-            in: path
-            required: true
-            schema:
-                type: integer
-                example: 1
-
-        MessageIdParam:
-            name: messageId
-            in: path
-            required: true
-            schema:
-                type: integer
-                example: 55
-
-    schemas:
-        CreateDMRequest:
-            type: object
-            properties:
-                partnerId:
-                    type: integer
-                    example: 200
-            required: [partnerId]
-
-        SendMessageRequest:
-            type: object
-            properties:
-                text:
-                    type: string
-                    example: "Hey, are you free today?"
-            required: [text]
-
-        MessageResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-            required: [message]
-
-        ErrorResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-            required: [message]
-
-        UserSafe:
-            type: object
-            description: Safe user profile fields (SAFE_USER + deletedAt)
-            properties:
-                id:
-                    type: integer
-                username:
-                    type: string
-                avatar:
-                    type: string
-                    nullable: true
-                deletedAt:
-                    type: string
-                    format: date-time
-                    nullable: true
-            required: [id]
-
-        ChatMember:
-            type: object
-            properties:
-                userId:
-                    type: integer
-                lastReadAt:
-                    type: string
-                    format: date-time
-                    nullable: true
-                user:
-                    $ref: "#/components/schemas/UserSafe"
-            required: [userId, user]
-
-        Message:
-            type: object
-            properties:
-                id:
-                    type: integer
-                chatId:
-                    type: integer
-                userId:
-                    type: integer
-                text:
-                    type: string
-                createdAt:
-                    type: string
-                    format: date-time
-                deletedAt:
-                    type: string
-                    format: date-time
-                    nullable: true
-                sender:
-                    $ref: "#/components/schemas/UserSafe"
-            required: [id, chatId, userId, text, createdAt, sender]
-
-        Chat:
-            type: object
-            properties:
-                id:
-                    type: integer
-                members:
-                    type: array
-                    items:
-                        $ref: "#/components/schemas/ChatMember"
-                messages:
-                    type: array
-                    description: In your queries you usually return only the latest message (limit 1) for chat preview.
-                    items:
-                        $ref: "#/components/schemas/Message"
-            required: [id, members]
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
+                            examples:
+                                forbidden:
+                                    value:
+                                        message: "Forbidden"
+                "500":
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"

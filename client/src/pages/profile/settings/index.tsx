@@ -9,28 +9,28 @@ import ArrowDownIcon from "../../../utils/icons/arrow-down-icon";
 import ChangeEmail from "./components/change-email";
 import ChangePassword from "./components/change-password";
 import PrivacySwitch from "./components/privacy-switch";
-import DeleteAccountModal from "./components/delete-account-modal";
+import ConfirmModal from "../components/confirm-modal";
 
 type ThemeMode = "system" | "light" | "dark";
 
-type OverlayProps = {
-    onClose: () => void;
-    children: React.ReactNode;
-};
+// type OverlayProps = {
+//     onClose: () => void;
+//     children: React.ReactNode;
+// };
 
-const Overlay = ({ onClose, children }: OverlayProps) => {
-    return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
-            <button
-                type="button"
-                className="absolute inset-0 bg-black/60"
-                onClick={onClose}
-                aria-label="Close"
-            />
-            {children}
-        </div>
-    );
-};
+// const Overlay = ({ onClose, children }: OverlayProps) => {
+//     return (
+//         <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+//             <button
+//                 type="button"
+//                 className="absolute inset-0 bg-black/60"
+//                 onClick={onClose}
+//                 aria-label="Close"
+//             />
+//             {children}
+//         </div>
+//     );
+// };
 
 const Settings = () => {
     const navigate = useNavigate();
@@ -61,7 +61,17 @@ const Settings = () => {
     }, [navigate, setAccount]);
 
     const handleLogout = useCallback(() => {
-        cleanupAndRedirectToSignin();
+        NiceModal.show(ConfirmModal, {
+            title: "Log out?",
+            description:
+                "Signing out will remove this account from the device.",
+            confirmText: "Log out",
+            cancelText: "Cancel",
+            variant: "danger",
+            onConfirm: async () => {
+                cleanupAndRedirectToSignin();
+            },
+        });
     }, [cleanupAndRedirectToSignin]);
 
     const onThemeChange = useCallback(
@@ -78,7 +88,6 @@ const Settings = () => {
             setSavingTheme(true);
             try {
                 await Axios.patch("/account/theme", { theme: mode });
-
                 setAccount(account ? { ...account, theme: mode } : account);
             } catch {
                 setTheme(prev);
@@ -87,16 +96,29 @@ const Settings = () => {
                 if (mountedRef.current) setSavingTheme(false);
             }
         },
-        [account, savingTheme, theme, setAccount]
+        [account, savingTheme, theme, setAccount],
     );
 
-    const onDeleteAccount = useCallback(async () => {
-        const ok: boolean = await NiceModal.show(DeleteAccountModal, {
-            Overlay,
+    const onDeleteAccount = useCallback(() => {
+        NiceModal.show(ConfirmModal, {
+            title: "Delete account?",
+            description:
+                "This permanently deletes your account. This action cannot be undone.",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            variant: "danger",
+            content: (
+                <div className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700 ring-1 ring-red-200 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-500/20">
+                    This action is permanent.
+                </div>
+            ),
+            onConfirm: async () => {
+                await Axios.delete("/account");
+            },
+            onSuccess: () => {
+                cleanupAndRedirectToSignin();
+            },
         });
-        if (!ok) return;
-
-        cleanupAndRedirectToSignin();
     }, [cleanupAndRedirectToSignin]);
 
     return (
@@ -178,7 +200,7 @@ const Settings = () => {
                                         disabled={savingTheme}
                                         onChange={(e) =>
                                             onThemeChange(
-                                                e.target.value as ThemeMode
+                                                e.target.value as ThemeMode,
                                             )
                                         }
                                         className="w-full appearance-none rounded-xl px-4 py-3 pr-10 text-sm font-semibold bg-white text-slate-900 ring-1 ring-slate-200/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 disabled:opacity-60 disabled:cursor-not-allowed dark:bg-black/30 dark:text-gray-100 dark:ring-white/10"

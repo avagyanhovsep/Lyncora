@@ -20,11 +20,11 @@ loader.controllers = { followController };
 loader.validators = {
     acceptRequestValidator: acceptRequestValidator.bind(
         null,
-        loader.services.followService
+        loader.services.followService,
     ),
     declineRequestValidator: declineRequestValidator.bind(
         null,
-        loader.services.followService
+        loader.services.followService,
     ),
     followValidator: followValidator.bind(null, loader.services.followService),
 };

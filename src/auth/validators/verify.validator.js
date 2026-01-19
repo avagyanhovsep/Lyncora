@@ -3,7 +3,7 @@ export default async function verifyValidator(
     sendEmail,
     req,
     res,
-    next
+    next,
 ) {
     const { email } = req.body;
     const otpInput = req.body.otp;
@@ -35,7 +35,7 @@ export default async function verifyValidator(
         void sendEmail(
             user.email,
             "Your new Lyncora verification code",
-            `Your previous code expired. Your new verification code is ${newOtp}. It expires in 2 minutes.`
+            `Your previous code expired. Your new verification code is ${newOtp}. It expires in 2 minutes.`,
         );
 
         return res.status(400).send({

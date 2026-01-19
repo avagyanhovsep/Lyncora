@@ -1,0 +1,417 @@
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+    parameters:
+        ChatIdParam:
+            name: chatId
+            in: path
+            required: true
+            schema:
+                type: integer
+
+        MessageIdParam:
+            name: messageId
+            in: path
+            required: true
+            schema:
+                type: integer
+
+    schemas:
+        MessageResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: OK
+            required: [message]
+
+        ErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: Missing/Invalid credentials...
+            required: [message]
+
+        UserSafe:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 113
+                firstName:
+                    type: string
+                    example: John
+                lastName:
+                    type: string
+                    example: Doe
+                username:
+                    type: string
+                    example: johndoe
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+                avatar:
+                    type: string
+                    nullable: true
+                    example: "1735075012345.png"
+                bio:
+                    type: string
+                    nullable: true
+                    example: ""
+                theme:
+                    type: string
+                    enum: [system, light, dark]
+                    example: system
+                isAccountPrivate:
+                    type: boolean
+                    example: false
+                isSigninAllowed:
+                    type: boolean
+                    example: true
+            required: [id, username, email, theme]
+
+        # ---------- AUTH ----------
+        SignupRequest:
+            type: object
+            properties:
+                firstName:
+                    type: string
+                    example: John
+                lastName:
+                    type: string
+                    example: Doe
+                username:
+                    type: string
+                    example: john_doe
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+                password:
+                    type: string
+                    example: "password123"
+            required: [firstName, lastName, username, email, password]
+
+        SigninRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+                password:
+                    type: string
+                    example: "password123"
+            required: [email, password]
+
+        SigninResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: "Code sent, please check your email to confirm the account..."
+                token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                endpoint:
+                    type: string
+                    example: "/profile"
+            required: [message, token, endpoint]
+
+        VerifyRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+                otp:
+                    type: string
+                    example: "123456"
+            required: [email, otp]
+
+        ForgotPasswordRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+            required: [email]
+
+        ResetPasswordRequest:
+            type: object
+            properties:
+                email:
+                    type: string
+                    format: email
+                    example: john@example.com
+                password:
+                    type: string
+                    example: "newpassword123"
+            required: [email, password]
+
+        # ---------- USERS / PROFILES ----------
+        UserProfile:
+            allOf:
+                - $ref: "#/components/schemas/UserSafe"
+                - type: object
+                  properties:
+                      followers:
+                          type: array
+                          items:
+                              $ref: "#/components/schemas/UserSafe"
+                      followings:
+                          type: array
+                          items:
+                              $ref: "#/components/schemas/UserSafe"
+                      posts:
+                          type: array
+                          items:
+                              $ref: "#/components/schemas/Post"
+
+        # ---------- POSTS ----------
+        Post:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 123
+                userId:
+                    type: integer
+                    example: 113
+                title:
+                    type: string
+                    nullable: true
+                    example: "My post"
+                description:
+                    type: string
+                    nullable: true
+                    example: "Description"
+                location:
+                    type: string
+                    nullable: true
+                    example: "Los Angeles"
+                tags:
+                    type: array
+                    items:
+                        type: string
+                    example: ["travel", "food"]
+                postImage:
+                    type: string
+                    nullable: true
+                    example: "1735075012345.png"
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+                updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+            required: [id, userId, createdAt, updatedAt]
+
+        PostReaction:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 1
+                postId:
+                    type: integer
+                    example: 123
+                userId:
+                    type: integer
+                    example: 113
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+            required: [id, postId, userId, createdAt]
+
+        PostFull:
+            allOf:
+                - $ref: "#/components/schemas/Post"
+                - type: object
+                  properties:
+                      author:
+                          $ref: "#/components/schemas/UserSafe"
+                      comments:
+                          type: array
+                          items:
+                              $ref: "#/components/schemas/Comment"
+                      reactions:
+                          type: array
+                          items:
+                              $ref: "#/components/schemas/PostReaction"
+
+        # ---------- COMMENTS ----------
+        Comment:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 501
+                postId:
+                    type: integer
+                    example: 123
+                userId:
+                    type: integer
+                    example: 113
+                text:
+                    type: string
+                    example: "Nice post!"
+                author:
+                    $ref: "#/components/schemas/UserSafe"
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+                updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+            required: [id, postId, userId, text, createdAt, updatedAt]
+
+        CommentReaction:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 12
+                commentId:
+                    type: integer
+                    example: 77
+                userId:
+                    type: integer
+                    example: 200
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+            required: [id, commentId, userId, createdAt]
+
+        # ---------- CHATS ----------
+        Chat:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 77
+                isGroup:
+                    type: boolean
+                    example: false
+                members:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/UserSafe"
+                latestMessage:
+                    $ref: "#/components/schemas/ChatMessage"
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+                updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+            required: [id, isGroup, createdAt, updatedAt]
+
+        ChatMessage:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 9001
+                chatId:
+                    type: integer
+                    example: 77
+                userId:
+                    type: integer
+                    example: 113
+                text:
+                    type: string
+                    example: "Hey"
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-01-19T12:00:00.000Z"
+            required: [id, chatId, userId, text, createdAt]
+
+        CreateDMRequest:
+            type: object
+            properties:
+                partnerId:
+                    type: integer
+                    example: 200
+            required: [partnerId]
+
+        SendMessageRequest:
+            type: object
+            properties:
+                text:
+                    type: string
+                    example: "Hey"
+            required: [text]
+
+    responses:
+        SuccessMessage:
+            description: Success
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/MessageResponse"
+                    examples:
+                        ok:
+                            value:
+                                message: "OK"
+
+        Unauthorized:
+            description: Unauthorized (missing or invalid token)
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorResponse"
+                    examples:
+                        unauthorized:
+                            value:
+                                message: "Unauthorized"
+
+        Forbidden:
+            description: Forbidden
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorResponse"
+                    examples:
+                        forbidden:
+                            value:
+                                message: "Forbidden"
+
+        NotFound:
+            description: Resource not found
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorResponse"
+                    examples:
+                        notFound:
+                            value:
+                                message: "Not found"
+
+        InternalServerError:
+            description: Internal server error
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ErrorResponse"
+                    examples:
+                        serverError:
+                            value:
+                                message: "Internal Server Error"

@@ -3,7 +3,7 @@ export default async function accountChangePasswordValidator(
     sendEmail,
     req,
     res,
-    next
+    next,
 ) {
     const { currentPasswordForPassword, newPassword } = req.body;
     const { email } = req.user;
@@ -17,7 +17,7 @@ export default async function accountChangePasswordValidator(
     const user = await service.findUser({ email });
     const isPasswordCorrect = await service.checkPassword(
         currentPasswordForPassword,
-        user.password
+        user.password,
     );
 
     if (!isPasswordCorrect) {
@@ -39,7 +39,7 @@ export default async function accountChangePasswordValidator(
     void sendEmail(
         user.email,
         "Your Lyncora password was changed",
-        `Your Lyncora password has been changed successfully. \n\nIf you did not make this change, reset your password immediately and contact support.`
+        `Your Lyncora password has been changed successfully. \n\nIf you did not make this change, reset your password immediately and contact support.`,
     );
 
     return next();

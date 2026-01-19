@@ -1,8 +1,5 @@
 export class AccountController {
-    constructor(
-        service,
-        sendEmail,
-    ) {
+    constructor(service, sendEmail) {
         this.service = service;
         this.sendEmail = sendEmail;
 
@@ -53,7 +50,7 @@ export class AccountController {
             mimetype,
         });
 
-        return res.status(200).json({ picture: avatarURL });
+        return res.status(200).send({ picture: avatarURL });
     }
 
     async updateBio(req, res) {

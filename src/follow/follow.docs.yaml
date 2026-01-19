@@ -2,8 +2,8 @@ paths:
     /follow/requests:
         get:
             tags: [Follow]
-            summary: Get follow requests
-            description: Returns pending follow requests (approved = 0) for the authenticated user.
+            summary: Get my follow requests
+            description: Returns pending follow requests for the authenticated user (approved = false).
             security:
                 - bearerAuth: []
             responses:
@@ -17,20 +17,27 @@ paths:
                                     requests:
                                         type: array
                                         items:
-                                            $ref: "#/components/schemas/FollowRequest"
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: integer
+                                                    example: 12
+                                                sender:
+                                                    $ref: "../../docs/components.yaml#/components/schemas/UserSafe"
+                                            required: [id, sender]
                                 required: [requests]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /follow/requests/accept:
         patch:
             tags: [Follow]
-            summary: Accept follow request
-            description: Sets an existing follow request's approved flag to true.
+            summary: Accept a follow request
+            description: Marks an existing follow request as approved.
             security:
                 - bearerAuth: []
             requestBody:
@@ -38,14 +45,22 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/RequestEdge"
+                            type: object
+                            properties:
+                                from:
+                                    type: integer
+                                    example: 10
+                                to:
+                                    type: integer
+                                    example: 20
+                            required: [from, to]
             responses:
                 "200":
-                    description: Request accepted
+                    description: Follow request accepted
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 ok:
                                     value:
@@ -55,22 +70,22 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 not_found:
                                     value:
                                         message: "Not found"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /follow/requests/decline:
         patch:
             tags: [Follow]
-            summary: Decline follow request
+            summary: Decline a follow request
             description: Deletes an existing follow request.
             security:
                 - bearerAuth: []
@@ -79,14 +94,22 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/RequestEdge"
+                            type: object
+                            properties:
+                                from:
+                                    type: integer
+                                    example: 10
+                                to:
+                                    type: integer
+                                    example: 20
+                            required: [from, to]
             responses:
                 "200":
-                    description: Request declined
+                    description: Follow request declined
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 ok:
                                     value:
@@ -96,25 +119,25 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 not_found:
                                     value:
                                         message: "Not found"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /follow/followings:
         post:
             tags: [Follow]
             summary: Resolve followings list
             description: |
-                Accepts a list of followingsInfo objects and returns user records for each `to`.
-                (This is implemented as POST because you send the list in the body.)
+                Accepts an array of follow relationships and resolves them into full user objects.
+                Implementation fetches each user by `following.to`.
             security:
                 - bearerAuth: []
             requestBody:
@@ -127,7 +150,12 @@ paths:
                                 followingsInfo:
                                     type: array
                                     items:
-                                        $ref: "#/components/schemas/FollowInfoTo"
+                                        type: object
+                                        properties:
+                                            to:
+                                                type: integer
+                                                example: 200
+                                        required: [to]
                             required: [followingsInfo]
             responses:
                 "200":
@@ -140,22 +168,22 @@ paths:
                                     followings:
                                         type: array
                                         items:
-                                            $ref: "#/components/schemas/UserSafe"
+                                            $ref: "../../docs/components.yaml#/components/schemas/UserSafe"
                                 required: [followings]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /follow/followers:
         post:
             tags: [Follow]
             summary: Resolve followers list
             description: |
-                Accepts a list of followersInfo objects and returns user records for each `from`.
-                (This is implemented as POST because you send the list in the body.)
+                Accepts an array of follow relationships and resolves them into full user objects.
+                Implementation fetches each user by `follower.from`.
             security:
                 - bearerAuth: []
             requestBody:
@@ -168,7 +196,12 @@ paths:
                                 followersInfo:
                                     type: array
                                     items:
-                                        $ref: "#/components/schemas/FollowInfoFrom"
+                                        type: object
+                                        properties:
+                                            from:
+                                                type: integer
+                                                example: 150
+                                        required: [from]
                             required: [followersInfo]
             responses:
                 "200":
@@ -181,30 +214,31 @@ paths:
                                     followers:
                                         type: array
                                         items:
-                                            $ref: "#/components/schemas/UserSafe"
+                                            $ref: "../../docs/components.yaml#/components/schemas/UserSafe"
                                 required: [followers]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /follow/{id}:
         post:
             tags: [Follow]
-            summary: Follow / unfollow / request / cancel request
+            summary: Follow / request / unfollow / cancel request
             description: |
-                Toggles follow state against a target user by id.
-                Behavior depends on whether the target account is private and whether a Follow row already exists.
+                Toggles follow behavior depending on target privacy and existing relationship:
 
-                - Public target:
-                  - If already followed: deletes row → 200 Unfollowed
-                  - If not followed: creates row approved=true → 200 Followed
-                - Private target:
-                  - If pending request exists (approved=false): deletes row → 200 Cancelled
-                  - If no row exists: creates row approved=false → 201 Requested
-                  - If approved row exists: deletes row → 200 Unfollowed
+                - If `id` equals my user id -> 400 (cannot follow yourself)
+                - If target user not found -> 404
+                - If target is private:
+                  - If no existing request -> creates request (approved=false, requested=true) and returns 201 Requested
+                  - If existing request approved=false -> cancels request and returns 200 Cancelled
+                  - If existing follow approved=true -> unfollow and returns 200 Unfollowed
+                - If target is public:
+                  - If already following -> unfollow and returns 200 Unfollowed
+                  - Else -> creates follow via controller (approved=true, requested=false) and returns 200 Followed
             security:
                 - bearerAuth: []
             parameters:
@@ -213,22 +247,31 @@ paths:
                   required: true
                   schema:
                       type: integer
-                  example: 45
+                      example: 200
+                  description: Target user id to follow/unfollow
             responses:
                 "200":
-                    description: Follow state updated (followed/unfollowed/cancelled)
+                    description: Follow state updated
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/FollowActionResponse"
+                                type: object
+                                properties:
+                                    status:
+                                        type: string
+                                        example: "Followed"
+                                    result:
+                                        type: object
+                                        nullable: true
+                                required: [status]
                             examples:
                                 followed:
                                     value:
                                         status: "Followed"
                                         result:
-                                            id: 10
-                                            from: 113
-                                            to: 45
+                                            id: 123
+                                            from: 10
+                                            to: 200
                                             approved: true
                                 unfollowed:
                                     value:
@@ -237,208 +280,63 @@ paths:
                                     value:
                                         status: "Cancelled"
                 "201":
-                    description: Follow request created for private account
+                    description: Follow request created (private account)
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/FollowActionResponse"
+                                type: object
+                                properties:
+                                    status:
+                                        type: string
+                                        example: "Requested"
+                                    result:
+                                        type: object
+                                required: [status, result]
                             examples:
                                 requested:
                                     value:
                                         status: "Requested"
                                         result:
-                                            id: 11
-                                            from: 113
-                                            to: 45
+                                            id: 456
+                                            from: 10
+                                            to: 200
                                             approved: false
+                                            requested: true
                 "400":
-                    description: Invalid operation (e.g., following yourself)
+                    description: Invalid request (cannot follow yourself)
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/FollowValidatorError"
-                            examples:
-                                self_follow:
-                                    value:
-                                        status: "Invalid"
-                                        message: "You cannot follow yourself"
+                                type: object
+                                properties:
+                                    status:
+                                        type: string
+                                        example: "Invalid"
+                                    message:
+                                        type: string
+                                        example: "You cannot follow yourself"
+                                required: [status, message]
                 "404":
                     description: Target user or request not found
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/FollowNotFoundError"
+                                type: object
+                                properties:
+                                    status:
+                                        type: string
+                                        nullable: true
+                                    message:
+                                        type: string
+                                required: [message]
                             examples:
                                 user_not_found:
                                     value:
                                         status: "NotFound"
                                         message: "User not found"
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
-
-components:
-    schemas:
-        MessageResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-            required: [message]
-
-        # Body schema for accept/decline
-        RequestEdge:
-            type: object
-            properties:
-                from:
-                    type: integer
-                    example: 113
-                to:
-                    type: integer
-                    example: 45
-            required: [from, to]
-
-        # Returned item in GET /follow/requests
-        FollowRequest:
-            type: object
-            properties:
-                id:
-                    type: integer
-                    example: 11
-                sender:
-                    $ref: "#/components/schemas/UserSafe"
-            required: [id, sender]
-
-        FollowInfoTo:
-            type: object
-            properties:
-                to:
-                    type: integer
-                    example: 45
-            required: [to]
-
-        FollowInfoFrom:
-            type: object
-            properties:
-                from:
-                    type: integer
-                    example: 45
-            required: [from]
-
-        FollowRow:
-            type: object
-            properties:
-                id:
-                    type: integer
-                    example: 11
-                from:
-                    type: integer
-                    example: 113
-                to:
-                    type: integer
-                    example: 45
-                approved:
-                    type: boolean
-                    example: false
-            required: [id, from, to, approved]
-
-        FollowActionResponse:
-            type: object
-            properties:
-                status:
-                    type: string
-                    example: "Followed"
-                result:
-                    $ref: "#/components/schemas/FollowRow"
-            required: [status]
-
-        FollowValidatorError:
-            type: object
-            properties:
-                status:
-                    type: string
-                    example: "Invalid"
-                message:
-                    type: string
-                    example: "You cannot follow yourself"
-            required: [status, message]
-
-        FollowNotFoundError:
-            type: object
-            properties:
-                status:
-                    type: string
-                    example: "NotFound"
-                message:
-                    type: string
-                    example: "User not found"
-            required: [status, message]
-
-        # If you already have this schema elsewhere, reuse it instead of duplicating.
-        UserSafe:
-            type: object
-            description: Safe user fields (based on SAFE_USER constant).
-            properties:
-                id:
-                    type: integer
-                    example: 45
-                username:
-                    type: string
-                    example: "john_doe"
-                firstName:
-                    type: string
-                    example: "John"
-                lastName:
-                    type: string
-                    example: "Doe"
-                avatar:
-                    type: string
-                    nullable: true
-                    example: "avatar.png"
-                bio:
-                    type: string
-                    nullable: true
-                    example: "Hello"
-                theme:
-                    type: string
-                    example: "system"
-                isAccountPrivate:
-                    type: boolean
-                    example: true
-
-    responses:
-        Unauthorized:
-            description: Missing/invalid auth token
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        unauthorized:
-                            value:
-                                message: "Unauthorized"
-
-        Forbidden:
-            description: Authenticated but not allowed
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        forbidden:
-                            value:
-                                message: "Forbidden"
-
-        InternalServerError:
-            description: Server error
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        error:
-                            value:
-                                message: "Internal server error"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"

@@ -26,7 +26,7 @@ export const authService = new AuthService(
     bcryptService,
     jwtService,
     cryptoService,
-    SAFE_USER
+    SAFE_USER,
 );
 const authController = new AuthController(authService, sendEmail);
 
@@ -54,12 +54,12 @@ loader.validators = {
     forgotPasswordValidator: forgotPasswordValidator.bind(
         null,
         authService,
-        sendEmail
+        sendEmail,
     ),
     resetPasswordValidator: resetPasswordValidator.bind(
         null,
         authService,
-        sendEmail
+        sendEmail,
     ),
 };
 

@@ -1,19 +1,35 @@
 import { useOutletContext } from "react-router-dom";
+import NiceModal from "@ebay/nice-modal-react";
 import { Axios } from "../../../../api";
 import type { IContext } from "../../../../types";
+import ConfirmModal from "../../components/confirm-modal";
 
 const PrivacySwitch = () => {
     const { account, setAccount } = useOutletContext<IContext>();
 
     const switchPrivacy = () => {
-        Axios.patch<{ isAccountPrivate: boolean }>("/account/privacy").then(
-            (response) => {
+        const nextPrivate = !account.isAccountPrivate;
+
+        NiceModal.show(ConfirmModal, {
+            title: nextPrivate
+                ? "Make account private?"
+                : "Make account public?",
+            description: nextPrivate
+                ? "Only approved followers can see your posts."
+                : "Anyone can see your posts.",
+            confirmText: nextPrivate ? "Make private" : "Make public",
+            cancelText: "Cancel",
+            variant: "default",
+            onConfirm: async () => {
+                const res = await Axios.patch<{ isAccountPrivate: boolean }>(
+                    "/account/privacy",
+                );
                 setAccount({
                     ...account,
-                    isAccountPrivate: response.data.isAccountPrivate,
+                    isAccountPrivate: res.data.isAccountPrivate,
                 });
-            }
-        );
+            },
+        });
     };
 
     return (

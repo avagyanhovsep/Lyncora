@@ -3,7 +3,7 @@ type FollowerItemUser = {
     username: string;
     firstName?: string | null;
     lastName?: string | null;
-    avatar?: string | null;
+    avatarURL?: string | null;
 };
 
 type FollowerItemProps = {
@@ -25,9 +25,9 @@ const FollowerItem = ({
                 dark:bg-black/20 dark:hover:bg-white/[0.03] dark:hover:ring-white/20`}
         >
             <div className="flex items-center gap-4 min-w-0">
-                {user.avatar ? (
+                {user.avatarURL ? (
                     <img
-                        src={user.avatar}
+                        src={user.avatarURL}
                         alt="avatar"
                         className="h-12 w-12 rounded-full object-cover ring-1 ring-slate-200/70 dark:ring-white/10"
                     />

@@ -23,25 +23,25 @@ chatRouter.post("/dm", loadChatValidator, chatController.loadChat);
 chatRouter.get(
     "/:chatId/messages",
     getMessageValidator,
-    chatController.getMessages
+    chatController.getMessages,
 );
 
 chatRouter.post(
     "/:chatId/messages",
     sendMessageValidator,
-    chatController.sendMessage
+    chatController.sendMessage,
 );
 
 chatRouter.post(
     "/:chatId/read",
     readMessageValidator,
-    chatController.readMessage
+    chatController.readMessage,
 );
 
 chatRouter.delete(
     "/:chatId/messages/:messageId",
     deleteMessageValidator,
-    chatController.deleteMessage
+    chatController.deleteMessage,
 );
 
 chatRouter.delete("/:chatId", deleteChatValidator, chatController.deleteChat);

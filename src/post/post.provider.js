@@ -6,11 +6,17 @@ import { PostService } from "./post.service.js";
 import { isAuthenticated } from "../../middlewares/authentication.js";
 import { authService } from "../auth/auth.provider.js";
 import { SAFE_USER } from "../../lib/attributes.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import {
-    DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
-import { attachImageToBucket, bucketName, randomImageName, s3 } from "../../lib/upload.js";
+    attachImageToBucket,
+    bucketName,
+    randomImageName,
+    s3,
+    upload,
+} from "../../lib/upload.js";
 import createPostValidator from "./validators/create-post.validator.js";
+import uploadPostImageValidator from "./validators/upload-post-image.validator.js";
+import multer from "multer";
 
 const postService = new PostService(
     models.User,
@@ -49,10 +55,15 @@ loader.validators = {
         loader.services.postService,
         DeleteObjectCommand,
         bucketName,
-        s3
+        s3,
     ),
     likeValidator: likeValidator.bind(null, loader.services.postService),
     createPostValidator,
+    uploadPostImageValidator: uploadPostImageValidator.bind(
+        null,
+        multer,
+        upload,
+    ),
 };
 
 export default loader;

@@ -6,10 +6,10 @@ import { commentRouter } from "../src/comment/comment.router.js";
 import { chatRouter } from "../src/chat/chat.router.js";
 
 export default function (app) {
-    app.use('/auth', authRouter);
-    app.use('/account', accountRouter);
-    app.use('/follow', followRouter);
-    app.use('/posts', postRouter);
+    app.use("/auth", authRouter);
+    app.use("/account", accountRouter);
+    app.use("/follow", followRouter);
+    app.use("/posts", postRouter);
     app.use("/posts/:postId/comments", commentRouter);
     app.use("/chats", chatRouter);
 }

@@ -10,14 +10,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/SignupRequest"
+                            $ref: "../../docs/components.yaml#/components/schemas/SignupRequest"
             responses:
                 "201":
                     description: Account created
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 created:
                                     value:
@@ -27,7 +27,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 missing:
                                     value:
@@ -54,7 +54,7 @@ paths:
                                     value:
                                         message: "Username is already in use..."
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /auth/signin:
         post:
@@ -69,14 +69,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/SigninRequest"
+                            $ref: "../../docs/components.yaml#/components/schemas/SigninRequest"
             responses:
                 "200":
                     description: Sign-in accepted (token issued; OTP may have been sent depending on account status)
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/SigninResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/SigninResponse"
                             examples:
                                 ok_verified:
                                     value:
@@ -93,7 +93,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 missing:
                                     value:
@@ -102,7 +102,7 @@ paths:
                                     value:
                                         message: "Wrong Credentials..."
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /auth/verify:
         post:
@@ -117,14 +117,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/VerifyRequest"
+                            $ref: "../../docs/components.yaml#/components/schemas/VerifyRequest"
             responses:
                 "200":
                     description: Account verified
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 success:
                                     value:
@@ -134,7 +134,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 missing:
                                     value:
@@ -146,17 +146,9 @@ paths:
                                     value:
                                         message: "Wrong code"
                 "404":
-                    description: User not found by email
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/MessageResponse"
-                            examples:
-                                not_found:
-                                    value:
-                                        message: "User not found..."
+                    $ref: "../../docs/components.yaml#/components/responses/NotFound"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /auth/forgot-password:
         post:
@@ -169,14 +161,14 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/ForgotPasswordRequest"
+                            $ref: "../../docs/components.yaml#/components/schemas/ForgotPasswordRequest"
             responses:
                 "200":
                     description: Reset email sent
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 success:
                                     value:
@@ -186,23 +178,15 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 missing:
                                     value:
                                         message: "Invalid/Missing credentials..."
                 "404":
-                    description: User not found by email
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/MessageResponse"
-                            examples:
-                                not_found:
-                                    value:
-                                        message: "User not found..."
+                    $ref: "../../docs/components.yaml#/components/responses/NotFound"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /auth/reset-password:
         post:
@@ -210,21 +194,21 @@ paths:
             summary: Reset password
             description: |
                 Resets password for a user (by email) after validating the new password format and ensuring it's not reused.
-                Note: Your current code validates password + email but does not verify OTP here.
+                Note: Current behavior does not verify OTP here.
             security: [] # public
             requestBody:
                 required: true
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/ResetPasswordRequest"
+                            $ref: "../../docs/components.yaml#/components/schemas/ResetPasswordRequest"
             responses:
                 "200":
                     description: Password reset completed
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 success:
                                     value:
@@ -234,7 +218,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/MessageResponse"
+                                $ref: "../../docs/components.yaml#/components/schemas/MessageResponse"
                             examples:
                                 missing:
                                     value:
@@ -246,7 +230,7 @@ paths:
                                     value:
                                         message: "You have already used this password previously..."
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"
 
     /auth/user:
         get:
@@ -264,200 +248,11 @@ paths:
                                 type: object
                                 properties:
                                     user:
-                                        $ref: "#/components/schemas/UserProfile"
+                                        $ref: "../../docs/components.yaml#/components/schemas/UserProfile"
                                 required: [user]
                 "401":
-                    $ref: "#/components/responses/Unauthorized"
+                    $ref: "../../docs/components.yaml#/components/responses/Unauthorized"
                 "403":
-                    $ref: "#/components/responses/Forbidden"
+                    $ref: "../../docs/components.yaml#/components/responses/Forbidden"
                 "500":
-                    $ref: "#/components/responses/InternalServerError"
-
-components:
-    schemas:
-        MessageResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-            required: [message]
-
-        SignupRequest:
-            type: object
-            properties:
-                firstName:
-                    type: string
-                    example: "John"
-                lastName:
-                    type: string
-                    example: "Doe"
-                username:
-                    type: string
-                    example: "john_doe"
-                email:
-                    type: string
-                    format: email
-                    example: "john@example.com"
-                password:
-                    type: string
-                    description: "8-18 chars, must include letters and numbers"
-                    example: "Password123"
-            required: [firstName, lastName, username, email, password]
-
-        SigninRequest:
-            type: object
-            properties:
-                email:
-                    type: string
-                    format: email
-                    example: "john@example.com"
-                password:
-                    type: string
-                    example: "Password123"
-            required: [email, password]
-
-        SigninResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-                token:
-                    type: string
-                    description: JWT token (expires in 1h per JWTService)
-                endpoint:
-                    type: string
-                    description: Suggested frontend redirect path
-            required: [message, token, endpoint]
-
-        VerifyRequest:
-            type: object
-            properties:
-                email:
-                    type: string
-                    format: email
-                    example: "john@example.com"
-                otp:
-                    type: string
-                    example: "123456"
-            required: [email, otp]
-
-        ForgotPasswordRequest:
-            type: object
-            properties:
-                email:
-                    type: string
-                    format: email
-                    example: "john@example.com"
-            required: [email]
-
-        ResetPasswordRequest:
-            type: object
-            properties:
-                email:
-                    type: string
-                    format: email
-                    example: "john@example.com"
-                password:
-                    type: string
-                    description: "8-18 chars, must include letters and numbers"
-                    example: "Newpass123"
-            required: [email, password]
-
-        UserSafe:
-            type: object
-            description: Safe user fields (based on SAFE_USER constant in your codebase).
-            properties:
-                id:
-                    type: integer
-                    example: 113
-                username:
-                    type: string
-                    example: "avagyanhovsep"
-                firstName:
-                    type: string
-                    example: "Hovsep"
-                lastName:
-                    type: string
-                    example: "Avagyan"
-                avatar:
-                    type: string
-                    nullable: true
-                    example: "1735321123456-avatar.png"
-                bio:
-                    type: string
-                    nullable: true
-                    example: "Building Lyncora."
-                theme:
-                    type: string
-                    nullable: false
-                    example: "system"
-                isAccountPrivate:
-                    type: boolean
-                    example: false
-
-        UserProfile:
-            allOf:
-                - $ref: "#/components/schemas/UserSafe"
-                - type: object
-                  properties:
-                      followings:
-                          type: array
-                          items:
-                              type: object
-                              properties:
-                                  receiver:
-                                      $ref: "#/components/schemas/UserSafe"
-                      followers:
-                          type: array
-                          items:
-                              type: object
-                              properties:
-                                  sender:
-                                      $ref: "#/components/schemas/UserSafe"
-                      posts:
-                          type: array
-                          items:
-                              type: object
-                              description: Post schema placeholder (replace with your actual Post schema if defined elsewhere).
-                              properties:
-                                  id:
-                                      type: integer
-                                  text:
-                                      type: string
-                                  createdAt:
-                                      type: string
-                                      format: date-time
-
-    responses:
-        Unauthorized:
-            description: Missing/invalid auth token
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        unauthorized:
-                            value:
-                                message: "Unauthorized"
-
-        Forbidden:
-            description: Authenticated but not allowed
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        forbidden:
-                            value:
-                                message: "Forbidden"
-
-        InternalServerError:
-            description: Server error
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/MessageResponse"
-                    examples:
-                        error:
-                            value:
-                                message: "Internal server error"
+                    $ref: "../../docs/components.yaml#/components/responses/InternalServerError"

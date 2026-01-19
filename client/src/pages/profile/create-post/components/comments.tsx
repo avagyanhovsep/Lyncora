@@ -65,6 +65,7 @@ const Comments = ({
                 {comments.map((comment: IComment) => (
                     <SingleComment
                         key={comment.id}
+                        postId={postInfo.id}
                         comment={comment}
                         commentCreated={comment.createdAt}
                         handleDeleteComment={handleDeleteComment}
