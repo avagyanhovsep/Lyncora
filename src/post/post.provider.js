@@ -6,6 +6,11 @@ import { PostService } from "./post.service.js";
 import { isAuthenticated } from "../../middlewares/authentication.js";
 import { authService } from "../auth/auth.provider.js";
 import { SAFE_USER } from "../../lib/attributes.js";
+import {
+    DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+import { attachImageToBucket, bucketName, randomImageName, s3 } from "../../lib/upload.js";
+import createPostValidator from "./validators/create-post.validator.js";
 
 const postService = new PostService(
     models.User,
@@ -13,9 +18,15 @@ const postService = new PostService(
     models.Comment,
     models.PostReaction,
     models.CommentReaction,
-    SAFE_USER
+    SAFE_USER,
 );
-const postController = new PostController(postService);
+
+const postController = new PostController(
+    postService,
+    bucketName,
+    randomImageName,
+    attachImageToBucket,
+);
 
 const loader = {};
 
@@ -35,9 +46,13 @@ loader.middlewares = {
 loader.validators = {
     deletePostValidator: deletePostValidator.bind(
         null,
-        loader.services.postService
+        loader.services.postService,
+        DeleteObjectCommand,
+        bucketName,
+        s3
     ),
     likeValidator: likeValidator.bind(null, loader.services.postService),
+    createPostValidator,
 };
 
 export default loader;

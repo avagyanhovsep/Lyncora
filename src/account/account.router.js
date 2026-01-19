@@ -9,6 +9,7 @@ const {
     accountChangePasswordValidator,
     updateBioValidator,
     deleteAccountValidator,
+    uploadAvatarValidator,
 } = init.validators;
 
 export const accountRouter = express.Router();
@@ -20,19 +21,19 @@ accountRouter.patch("/privacy", accountController.setAccountPrivacy);
 accountRouter.patch(
     "/settings/email",
     accountChangeEmailValidator,
-    accountController.changeUserEmail
+    accountController.changeUserEmail,
 );
 
 accountRouter.patch(
     "/settings/password",
     accountChangePasswordValidator,
-    accountController.changeUserPassword
+    accountController.changeUserPassword,
 );
 
 accountRouter.patch(
     "/avatar",
-    upload.single("profile-pic"),
-    accountController.handleAvatarUpload
+    [upload.single("profile-pic"), uploadAvatarValidator],
+    accountController.handleAvatarUpload,
 );
 
 accountRouter.patch("/bio", updateBioValidator, accountController.updateBio);
@@ -42,7 +43,7 @@ accountRouter.patch("/theme", accountController.updateTheme);
 accountRouter.delete(
     "/",
     deleteAccountValidator,
-    accountController.deleteAccount
+    accountController.deleteAccount,
 );
 
 accountRouter.get("/search/:text", accountController.searchUsers);

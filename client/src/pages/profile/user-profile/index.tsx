@@ -119,7 +119,7 @@ const UserProfile = () => {
                             <div className="relative">
                                 <div className="ring-2 ring-slate-200/70 dark:ring-white/15 rounded-full">
                                     <ProfileAvatar
-                                        src={userInfo.avatar}
+                                        src={userInfo.avatarURL}
                                         size="md"
                                     />
                                 </div>

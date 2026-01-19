@@ -4,7 +4,6 @@ import SearchIcon from "../../../../utils/icons/search-icon";
 import PlaneIcon from "../../../../utils/icons/plane-icon";
 import RequestsIcon from "../../../../utils/icons/requests-icon";
 import PlusIcon from "../../../../utils/icons/plus-icon";
-import Image from "../../components/image";
 
 const Navigation = ({
     account,
@@ -59,9 +58,9 @@ const Navigation = ({
                             >
                                 {item.icon ? (
                                     <item.icon filled={isActive} />
-                                ) : account.avatar ? (
-                                    <Image
-                                        src={account.avatar}
+                                ) : account.avatarURL ? (
+                                    <img
+                                        src={account.avatarURL}
                                         alt="avatar"
                                         className="w-[26px] h-[26px] rounded-full object-cover ring-1 ring-slate-300 dark:ring-white/10"
                                     />

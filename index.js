@@ -3,12 +3,19 @@ import swaggerUI from "swagger-ui-express";
 import cors from "cors";
 import loadRoutes from "./config/routes.js";
 import path from "path";
+import { fileURLToPath } from "url";
 import SwaggerParser from "@apidevtools/swagger-parser";
 import models from "./config/database/index.js";
 import http from "http";
 import { Server } from "socket.io";
 
 const app = express();
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// const CLIENT_DIST_PATH = path.join(__dirname, "client", "dist");
+// app.use(express.static(CLIENT_DIST_PATH));
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
@@ -21,6 +28,9 @@ const openapiPath = path.resolve("./docs/openapi.yaml");
 const bundledSpec = await SwaggerParser.bundle(openapiPath);
 
 app.use("/api", swaggerUI.serve, swaggerUI.setup(bundledSpec));
+// app.use((req, res) => {
+//   res.sendFile(path.join(CLIENT_DIST_PATH, "index.html"));
+// });
 
 await models.sequelize.sync({ alter: true });
  

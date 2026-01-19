@@ -95,11 +95,11 @@ const CreateNewPost = () => {
         setPostImageFile(null);
 
         if (postImageRef.current) postImageRef.current.value = "";
-        clearErrors("postImage" as const);
+        clearErrors("postImageURL" as const);
     };
 
     const { ref: postImageReactHookRef, ...postImageRegister } = register(
-        "postImage" as const,
+        "postImageURL" as const,
         {
             validate: () => {
                 return postImageFile ? true : "Upload your post image...";
@@ -119,7 +119,7 @@ const CreateNewPost = () => {
 
     const fileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] ?? null;
-        if (file) clearErrors("postImage" as const);
+        if (file) clearErrors("postImageURL" as const);
 
         setPostImageFile(file);
 
@@ -142,7 +142,7 @@ const CreateNewPost = () => {
     const handleCreatePost: SubmitHandler<IPost> = async (postInformation) => {
         try {
             if (!postImageFile) {
-                setError("postImage" as const, {
+                setError("postImageURL" as const, {
                     type: "required",
                     message: "Upload your post image...",
                 });
@@ -257,7 +257,9 @@ const CreateNewPost = () => {
                     >
                         <MediaUploader
                             errorText={
-                                errors.postImage?.message as string | undefined
+                                errors.postImageURL?.message as
+                                    | string
+                                    | undefined
                             }
                             onPickFile={() => postImageRef.current?.click()}
                             previewUrl={postImagePreview}

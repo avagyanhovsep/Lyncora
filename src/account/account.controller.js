@@ -1,5 +1,8 @@
 export class AccountController {
-    constructor(service, sendEmail) {
+    constructor(
+        service,
+        sendEmail,
+    ) {
         this.service = service;
         this.sendEmail = sendEmail;
 
@@ -43,19 +46,14 @@ export class AccountController {
     }
 
     async handleAvatarUpload(req, res) {
-        if (!req.file) {
-            return res
-                .status(400)
-                .send({ message: "Profile picture is required." });
-        }
+        const { userId, buffer, mimetype } = req.avatarUpload;
+        const { avatarURL } = await this.service.uploadAvatar({
+            userId,
+            buffer,
+            mimetype,
+        });
 
-        const user = await this.service.findUser({ id: req.user.id });
-
-        const avatarUrl = `/uploads/${req.file.filename}`; 
-        user.avatar = avatarUrl;
-
-        await user.save();
-        return res.status(200).send({ picture: avatarUrl });
+        return res.status(200).json({ picture: avatarURL });
     }
 
     async updateBio(req, res) {

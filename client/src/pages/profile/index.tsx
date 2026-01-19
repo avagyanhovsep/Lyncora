@@ -38,7 +38,7 @@ const Account = () => {
             .then((response) =>
                 setAccount({
                     ...account,
-                    avatar: response.data.picture,
+                    avatarURL: response.data.picture,
                 })
             )
             .catch((err) => console.log(err));
@@ -67,7 +67,7 @@ const Account = () => {
                             />
 
                             <ProfileAvatar
-                                src={account.avatar}
+                                src={account.avatarURL}
                                 editable
                                 onPickFile={() =>
                                     avatarPicture.current?.click()

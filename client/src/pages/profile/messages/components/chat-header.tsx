@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import type { IUser } from "../../../../types";
-import Image from "../../components/image";
 import MoreIcon from "../../../../utils/icons/more-icon";
 
 type Props = {
@@ -71,9 +70,9 @@ export default function ChatHeader({
                         >
                             <div className="flex items-center gap-3">
                                 <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-slate-200/70 dark:ring-white/10">
-                                    {partner.avatar ? (
-                                        <Image
-                                            src={partner.avatar}
+                                    {partner.avatarURL ? (
+                                        <img
+                                            src={partner.avatarURL}
                                             alt="avatar"
                                             className="h-full w-full object-cover"
                                         />

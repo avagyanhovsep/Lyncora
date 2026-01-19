@@ -16,12 +16,21 @@ export class PostService {
         this.SAFE_USER = SAFE_USER;
     }
 
-    async createPost(title, description, authorId, postImage, tags, location) {
+    async createPost(
+        title,
+        description,
+        authorId,
+        postImageName,
+        postImageURL,
+        tags,
+        location,
+    ) {
         return await this.postModel.create({
             title,
             description,
             authorId,
-            postImage, 
+            postImageName,
+            postImageURL,
             tags,
             location,
         });

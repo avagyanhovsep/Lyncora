@@ -16,6 +16,8 @@
     "description": "",
     "dependencies": {
         "@apidevtools/swagger-parser": "^12.1.0",
+        "@aws-sdk/client-s3": "^3.971.0",
+        "@aws-sdk/s3-request-presigner": "^3.971.0",
         "bcrypt": "^6.0.0",
         "cors": "^2.8.5",
         "crypto": "^1.0.1",
@@ -26,6 +28,7 @@
         "mysql2": "^3.15.3",
         "nodemailer": "^7.0.10",
         "sequelize": "^6.37.7",
+        "sharp": "^0.34.5",
         "socket.io": "^4.8.1",
         "swagger-ui-express": "^5.0.1",
         "uniqid": "^5.4.0",

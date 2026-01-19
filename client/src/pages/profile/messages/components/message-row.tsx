@@ -1,5 +1,4 @@
 import type { IMessage, IUser } from "../../../../types";
-import Image from "../../components/image";
 import MoreIcon from "../../../../utils/icons/more-icon";
 
 type Props = {
@@ -39,9 +38,9 @@ export default function MessageRow({
                 {!mine ? (
                     <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full">
                         {showAvatar ? (
-                            !isDeletedPartner && partner.avatar ? (
-                                <Image
-                                    src={partner.avatar}
+                            !isDeletedPartner && partner.avatarURL ? (
+                                <img
+                                    src={partner.avatarURL}
                                     alt="avatar"
                                     className="h-full w-full object-cover"
                                 />

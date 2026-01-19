@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import type { IAccount } from "../../../../types";
-import Image from "../../components/image";
 import ArrowDownIcon from "../../../../utils/icons/arrow-down-icon";
 
 export default function SearchUserRow({ user }: { user: IAccount }) {
@@ -9,9 +8,9 @@ export default function SearchUserRow({ user }: { user: IAccount }) {
             <div className="group flex items-center gap-3 px-4 py-3 hover:bg-slate-50 duration-200 dark:hover:bg-white/5">
                 <div className="shrink-0">
                     <div className="w-11 h-11 rounded-full overflow-hidden ring-1 ring-slate-200/70 dark:ring-white/10">
-                        {user.avatar ? (
-                            <Image
-                                src={user.avatar}
+                        {user.avatarURL ? (
+                            <img
+                                src={user.avatarURL}
                                 alt="avatar"
                                 className="w-11 h-11 object-cover"
                             />
@@ -35,7 +34,7 @@ export default function SearchUserRow({ user }: { user: IAccount }) {
                 </div>
 
                 <div className="shrink-0 text-slate-400 group-hover:text-slate-600 duration-200 dark:text-slate-500 dark:group-hover:text-slate-300">
-                    <ArrowDownIcon className="-rotate-90 w-5 h-5"/>
+                    <ArrowDownIcon className="-rotate-90 w-5 h-5" />
                 </div>
             </div>
         </Link>

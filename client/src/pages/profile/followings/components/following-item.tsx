@@ -1,5 +1,3 @@
-import Image from "../../components/image";
-
 type FollowingItemUser = {
     id: number;
     username: string;
@@ -27,7 +25,7 @@ export const FollowingItem = ({
         >
             <div className="flex items-center gap-4 min-w-0">
                 {user.avatar ? (
-                    <Image
+                    <img
                         src={user.avatar}
                         alt="avatar"
                         className="h-12 w-12 rounded-full object-cover ring-1 ring-slate-200/70 dark:ring-white/10"

@@ -50,9 +50,11 @@ export default function (sequelize, DataTypes) {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
-            avatar: {
-                type: DataTypes.STRING,
-                defaultValue: "",
+            avatarName: {
+                type: DataTypes.TEXT("long"),
+            },
+            avatarURL: {
+                type: DataTypes.TEXT("long"),
             },
             bio: {
                 type: DataTypes.STRING,
@@ -67,7 +69,7 @@ export default function (sequelize, DataTypes) {
         {
             paranoid: true,
             deletedAt: "deletedAt",
-        }
+        },
     );
 
     User.associate = (models) => {

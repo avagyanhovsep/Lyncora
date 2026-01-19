@@ -13,6 +13,14 @@ import { sendEmail } from "../../lib/mailer.js";
 import { chatService } from "../chat/chat.provider.js";
 import { sequelize } from "../../config/database/database.config.js";
 import deleteAccountValidator from "./validators/delete-account.validator.js";
+import {
+    attachImageToBucket,
+    bucketName,
+    randomImageName,
+    s3,
+} from "../../lib/upload.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import uploadAvatarValidator from "./validators/upload-avatar.validator.js";
 
 const bcryptService = new BcryptService(bcrypt);
 const accountService = new AccountService(
@@ -22,7 +30,12 @@ const accountService = new AccountService(
     chatService,
     sequelize,
     Op,
-    SAFE_USER
+    SAFE_USER,
+    DeleteObjectCommand,
+    s3,
+    randomImageName,
+    attachImageToBucket,
+    bucketName,
 );
 const accountController = new AccountController(accountService, sendEmail);
 
@@ -50,19 +63,20 @@ loader.validators = {
     accountChangeEmailValidator: accountChangeEmailValidator.bind(
         null,
         accountService,
-        sendEmail
+        sendEmail,
     ),
     accountChangePasswordValidator: accountChangePasswordValidator.bind(
         null,
         accountService,
-        sendEmail
+        sendEmail,
     ),
     updateBioValidator,
     deleteAccountValidator: deleteAccountValidator.bind(
         null,
         accountService,
-        sendEmail
+        sendEmail,
     ),
+    uploadAvatarValidator,
 };
 
 export default loader;

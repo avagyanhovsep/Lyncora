@@ -5,7 +5,8 @@ export interface IUser {
     username: string;
     email: string;
     password: string;
-    avatar: string;
+    avatarName: string;
+    avatarURL: string;
     coverImage: string;
     isAccountPrivate: boolean;
     bio?: string;
@@ -46,7 +47,8 @@ export interface IPost {
     title: string;
     description: string;
     authorId: number;
-    postImage: string;
+    postImageName: string;
+    postImageURL: string;
     tags: string[];
     location: string;
     ago: number;

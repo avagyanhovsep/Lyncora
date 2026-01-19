@@ -1,5 +1,10 @@
 export class PostController {
-    constructor(service) {
+    constructor(
+        service,
+        bucketName,
+        randomImageName,
+        attachImageToBucket,
+    ) {
         this.service = service;
 
         this.createNewPost = this.createNewPost.bind(this);
@@ -7,29 +12,31 @@ export class PostController {
         this.like = this.like.bind(this);
         this.getAllLikes = this.getAllLikes.bind(this);
         this.deletePost = this.deletePost.bind(this);
+
+        this.bucketName = bucketName;
+        this.randomImageName = randomImageName;
+        this.attachImageToBucket = attachImageToBucket;
     }
 
     async createNewPost(req, res) {
         const { title, description, location } = req.body;
         const { id } = req.user;
+        const tags = req.body.tags ? JSON.parse(req.body.tags) : [];
+        const imageName = this.randomImageName();
 
-        let tags = [];
-        try {
-            tags = req.body.tags ? JSON.parse(req.body.tags) : [];
-        } catch {
-            tags = [];
-        }
+        const { url } = await this.attachImageToBucket(
+            req.file.buffer,
+            this.bucketName,
+            req.file.mimetype,
+            imageName,
+        );
 
-        const file = req.file;
-        if (!file) {
-            return res.status(400).send({ message: "Post image is required." });
-        }
-        const postImageUrl = `/uploads/${file.filename}`;
         const newPost = await this.service.createPost(
             title,
             description,
             id,
-            postImageUrl,
+            imageName,
+            url,
             tags,
             location,
         );
@@ -45,13 +52,8 @@ export class PostController {
     }
 
     async deletePost(req, res) {
-        await this.service.deletePost(req.post);
         return res.status(200).send({ message: "Post deleted successfully" });
     }
-
-    // async uploadPostImage(req, res) {
-    //     return res.status(200).send({ picture: req.file.filename });
-    // }
 
     async like(req, res) {
         const { id } = req.user;

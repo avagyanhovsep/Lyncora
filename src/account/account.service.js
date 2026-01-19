@@ -6,7 +6,13 @@ export class AccountService {
         chatService,
         sequelize,
         Op,
-        SAFE_USER
+        SAFE_USER,
+
+        DeleteObjectCommand,
+        s3,
+        randomImageName,
+        attachImageToBucket,
+        bucketName,
     ) {
         this.userModel = userModel;
         this.followModel = followModel;
@@ -17,6 +23,11 @@ export class AccountService {
         this.SAFE_USER = SAFE_USER;
 
         this.deleteUserAccount = this.deleteUserAccount.bind(this);
+        this.DeleteObjectCommand = DeleteObjectCommand;
+        this.s3 = s3;
+        this.randomImageName = randomImageName;
+        this.attachImageToBucket = attachImageToBucket;
+        this.bucketName = bucketName;
     }
 
     async findUser(params) {
@@ -114,5 +125,37 @@ export class AccountService {
 
             return { email, username, firstName, lastName };
         });
+    }
+
+    async uploadAvatar({ userId, buffer, mimetype }) {
+        const user = await this.userModel.findByPk(userId);
+        if (user.avatarName?.trim()) {
+            await this.deleteOldAvatar(this.bucketName, user.avatarName);
+        }
+
+        const imageName = this.randomImageName();
+
+        const { url } = await this.attachImageToBucket(
+            buffer,
+            this.bucketName,
+            mimetype,
+            imageName,
+        );
+
+        user.avatarName = imageName;
+        user.avatarURL = url;
+        await user.save();
+
+        return { avatarURL: url, avatarName: imageName };
+    }
+
+    async deleteOldAvatar(bucketName, oldAvatar) {
+        const params = {
+            Bucket: bucketName,
+            Key: oldAvatar,
+        };
+
+        const command = new this.DeleteObjectCommand(params);
+        return await this.s3.send(command);
     }
 }

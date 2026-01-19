@@ -1,5 +1,4 @@
-import Image from "../components/image"; 
-import PencilIcon from "../../../utils/icons/pencil-icon"; 
+ import PencilIcon from "../../../utils/icons/pencil-icon"; 
 
 type Props = {
     src?: string | null;
@@ -29,7 +28,7 @@ export default function ProfileAvatar({
                 title={editable ? "Change avatar" : undefined}
             >
                 {src ? (
-                    <Image
+                    <img
                         src={src}
                         alt="avatar"
                         className="w-full h-full object-cover"

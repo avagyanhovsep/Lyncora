@@ -1,5 +1,4 @@
 import type { IRawFollowing } from "../../../../types";
-import Image from "../../components/image";
 
 type Props = {
     request: IRawFollowing;
@@ -13,9 +12,9 @@ export default function RequestRow({ request, onAccept, onDecline }: Props) {
     return (
         <li className="flex items-center justify-between gap-4 rounded-xl bg-slate-50 p-4 hover:bg-slate-100 transition dark:bg-black/20 dark:hover:bg-white/[0.03]">
             <div className="flex items-center gap-4 min-w-0">
-                {sender.avatar ? (
-                    <Image
-                        src={sender.avatar}
+                {sender.avatarURL ? (
+                    <img
+                        src={sender.avatarURL}
                         alt="avatar"
                         className="h-12 w-12 rounded-full object-cover ring-1 ring-slate-200/70 dark:ring-white/10"
                     />

@@ -10,7 +10,6 @@ import type {
     IPostReaction,
 } from "../../../../types";
 import { Axios } from "../../../../api";
-import Image from "../../components/image";
 import DeletePostBtn from "../components/delete-post-button";
 import Comments from "../components/comments";
 import LikeSection from "../components/like-section";
@@ -99,8 +98,8 @@ const ImageViewer = ({ onClose, postId, handleDeletePost }: Props) => {
             <div className="w-full max-w-6xl h-[92vh] sm:h-[90vh] md:h-[88vh] rounded-2xl overflow-hidden bg-white ring-1 ring-slate-200/70 shadow-2xl flex flex-col lg:flex-row dark:bg-neutral-950 dark:ring-white/10">
                 <div className="relative bg-black flex items-center justify-center lg:flex-1">
                     <div className="w-full h-[45vh] sm:h-[52vh] md:h-[55vh] lg:h-full flex items-center justify-center">
-                        <Image
-                            src={postInfo.postImage}
+                        <img
+                            src={postInfo.postImageURL}
                             alt="Preview"
                             className="h-full w-full object-contain"
                         />
@@ -120,9 +119,9 @@ const ImageViewer = ({ onClose, postId, handleDeletePost }: Props) => {
                         <div className="w-full flex items-center justify-between gap-4">
                             <Link to={"/profile"} className="min-w-0">
                                 <div className="flex items-center gap-3">
-                                    {postInfo.author.avatar ? (
-                                        <Image
-                                            src={postInfo.author.avatar}
+                                    {postInfo.author.avatarURL ? (
+                                        <img
+                                            src={postInfo.author.avatarURL}
                                             alt="avatar"
                                             className="h-10 w-10 rounded-full object-cover ring-1 ring-slate-200/70 dark:ring-white/10"
                                         />

@@ -7,7 +7,6 @@ import type { IContext, IMessage, IUser } from "../../../../types";
 import { useSocket } from "../../../../socket/socket-provider";
 import { Axios } from "../../../../api";
 
-import Image from "../../components/image";
 import PlaneIcon from "../../../../utils/icons/plane-icon";
 import MoreIcon from "../../../../utils/icons/more-icon";
 import DeleteConversationModal from "./delete-chat-modal";
@@ -98,7 +97,7 @@ export default function Chat({
 
             if (onNewMessage) onNewMessage(chatId, message);
         },
-        [chatId, onNewMessage]
+        [chatId, onNewMessage],
     );
 
     useEffect(() => {
@@ -185,7 +184,7 @@ export default function Chat({
 
             setMessages((prev) => prev.filter((m) => m.id !== messageId));
         },
-        [chatId]
+        [chatId],
     );
 
     const send = useCallback(async () => {
@@ -194,7 +193,7 @@ export default function Chat({
 
         if (isDeletedPartner) {
             setSendError(
-                "This user deleted their account. You can view messages, but you can’t send new ones."
+                "This user deleted their account. You can view messages, but you can’t send new ones.",
             );
             return;
         }
@@ -223,7 +222,7 @@ export default function Chat({
                 if (status === 410) {
                     setSendError(
                         serverMessage ||
-                            "This user deleted their account. You can’t send new messages."
+                            "This user deleted their account. You can’t send new messages.",
                     );
                     return;
                 }
@@ -231,7 +230,7 @@ export default function Chat({
                 if (status === 403) {
                     setSendError(
                         serverMessage ||
-                            "You are not allowed to send a message."
+                            "You are not allowed to send a message.",
                     );
                     return;
                 }
@@ -258,7 +257,7 @@ export default function Chat({
                         className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 active:scale-95 transition dark:hover:bg-white/10"
                         aria-label="Back"
                     >
-                        <ArrowDownIcon  className="rotate-90 w-5 h-5"/>
+                        <ArrowDownIcon className="rotate-90 w-5 h-5" />
                     </button>
 
                     {isDeletedPartner ? (
@@ -300,9 +299,9 @@ export default function Chat({
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-slate-200/70 dark:ring-white/10">
-                                        {partner.avatar ? (
-                                            <Image
-                                                src={partner.avatar}
+                                        {partner.avatarURL ? (
+                                            <img
+                                                src={partner.avatarURL}
                                                 alt="avatar"
                                                 className="h-full w-full object-cover"
                                             />
@@ -449,9 +448,11 @@ export default function Chat({
                                             <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full">
                                                 {showAvatar ? (
                                                     !isDeletedPartner &&
-                                                    partner.avatar ? (
-                                                        <Image
-                                                            src={partner.avatar}
+                                                    partner.avatarURL ? (
+                                                        <img
+                                                            src={
+                                                                partner.avatarURL
+                                                            }
                                                             alt="avatar"
                                                             className="h-full w-full object-cover"
                                                         />
@@ -479,7 +480,7 @@ export default function Chat({
                                                         type="button"
                                                         onClick={() =>
                                                             openMessageActions(
-                                                                message.id
+                                                                message.id,
                                                             )
                                                         }
                                                         className="transition inline-flex items-center justify-center"

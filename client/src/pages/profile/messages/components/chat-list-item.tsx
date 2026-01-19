@@ -1,4 +1,3 @@
-import Image from "../../components/image";
 import type { IUser } from "../../../../types";
 
 type Props = {
@@ -34,9 +33,9 @@ export default function ChatListItem({
             `}
         >
             <div className="h-12 w-12 rounded-full bg-slate-100 dark:bg-white/10 ring-1 ring-slate-200/70 dark:ring-white/10 overflow-hidden shrink-0">
-                {!isDeleted && partner?.avatar ? (
-                    <Image
-                        src={partner.avatar}
+                {!isDeleted && partner?.avatarURL ? (
+                    <img
+                        src={partner.avatarURL}
                         alt="avatar"
                         className="w-full h-full rounded-full object-cover"
                     />

@@ -14,9 +14,11 @@ export default function (sequelize, DataTypes) {
         description: {
             type: DataTypes.STRING,
         },
-        postImage: {
-            type: DataTypes.STRING,
-            defaultValue: "",
+        postImageName: {
+            type: DataTypes.TEXT("long"),
+        },
+        postImageURL: {
+            type: DataTypes.TEXT("long"),
         },
         tags: {
             type: DataTypes.JSON,

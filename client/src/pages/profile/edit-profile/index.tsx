@@ -31,7 +31,7 @@ const EditProfile = () => {
             .then((response) => {
                 setAccount({
                     ...account,
-                    avatar: response.data.picture,
+                    avatarURL: response.data.picture,
                 });
             })
             .catch(console.error)
@@ -72,7 +72,7 @@ const EditProfile = () => {
 
                     <ProfilePhotoCard
                         username={account.username}
-                        avatar={account.avatar}
+                        avatar={account.avatarURL}
                         onPickFile={onPickFile}
                         buttonText="Change photo"
                     />

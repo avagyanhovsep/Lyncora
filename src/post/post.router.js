@@ -6,11 +6,15 @@ export const postRouter = express.Router();
 
 const { postController } = init.controllers;
 const { isAuthenticated } = init.middlewares;
-const { deletePostValidator, likeValidator } = init.validators;
+const { deletePostValidator, likeValidator, createPostValidator } = init.validators;
 
 postRouter.use(isAuthenticated);
 
-postRouter.post("/", upload.single("postImage"), postController.createNewPost);
+postRouter.post(
+    "/",
+    [upload.single("postImage"), createPostValidator],
+    postController.createNewPost,
+);
 postRouter.post("/:postId/likes", likeValidator, postController.like);
 postRouter.get("/:postId/likes", postController.getAllLikes);
 postRouter.get("/:postId", postController.getPostInfo);

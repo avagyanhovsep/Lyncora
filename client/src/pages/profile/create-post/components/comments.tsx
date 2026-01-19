@@ -1,5 +1,4 @@
 import type { IComment, IPost } from "../../../../types";
-import Image from "../../components/image";
 import SingleComment from "./single-comment";
 
 
@@ -16,9 +15,9 @@ const Comments = ({
         <div className="p-5 space-y-4">
             {postInfo.title.length > 0 ? (
                 <div className="flex gap-3 pb-4 border-b border-slate-200 dark:border-white/10">
-                    {postInfo.author.avatar ? (
-                        <Image
-                            src={postInfo.author.avatar}
+                    {postInfo.author.avatarURL ? (
+                        <img
+                            src={postInfo.author.avatarURL}
                             alt="avatar"
                             className="h-10 w-10 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/10"
                         />

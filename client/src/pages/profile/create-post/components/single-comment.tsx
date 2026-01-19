@@ -7,7 +7,6 @@ import { Axios } from "../../../../api";
 import TimeAgo from "../../components/time-ago";
 import MoreIcon from "../../../../utils/icons/more-icon";
 import HeartIcon from "../../../../utils/icons/heart-icon";
-import Image from "../../components/image";
 
 const SingleComment = ({
     comment,
@@ -69,9 +68,9 @@ const SingleComment = ({
     return (
         <div className="group flex items-start justify-between gap-3 rounded-xl px-2 py-2 transition hover:bg-slate-100 dark:hover:bg-white/[0.03]">
             <div className="flex gap-3 min-w-0">
-                {comment.user.avatar ? (
-                    <Image
-                        src={comment.user.avatar}
+                {comment.user.avatarURL ? (
+                    <img
+                        src={comment.user.avatarURL}
                         alt="avatar"
                         className="h-9 w-9 rounded-full object-cover ring-1 ring-slate-200 dark:ring-white/10"
                     />
