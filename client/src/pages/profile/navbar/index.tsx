@@ -44,7 +44,7 @@ const Navbar = ({ account }: { account: IAccount }) => {
                 ${collapsed ? "md:w-[76px]" : "md:w-[76px] xl:w-[260px]"}
                 h-[64px] md:h-full
                 border-t md:border-t-0 md:border-r border-slate-200/70 dark:border-white/10
-                bg-white/85 dark:bg-neutral-900/80 md:bg-transparent
+                bg-white/85 dark:bg-[#0b1013] md:bg-transparent
                 backdrop-blur-md md:backdrop-blur-0
                 transition-all duration-300
             `}
