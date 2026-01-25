@@ -4,7 +4,6 @@ import { Axios } from "../../../api";
 import type { IChat, IContext, IMessage, IUser } from "../../../types";
 import Chat from "./components/chat";
 import InboxShell from "./components/inbox-shell";
-import InboxSidebarHeader from "./components/inbox-sidebar-header";
 import { InboxEmpty, SelectChatHint } from "./components/inbox-empty";
 import InboxToolbar from "./components/inbox-toolbar";
 import ChatListItem from "./components/chat-list-item";
@@ -47,14 +46,14 @@ const Messages = () => {
                     const members = chat.members.map((member) =>
                         member.userId === account.id
                             ? { ...member, lastReadAt: now }
-                            : member
+                            : member,
                     );
 
                     return { ...chat, members };
-                })
+                }),
             );
         },
-        [account.id]
+        [account.id],
     );
 
     useEffect(() => {
@@ -106,7 +105,7 @@ const Messages = () => {
                         ? chat.members.map((member) =>
                               member.userId === account.id
                                   ? { ...member, lastReadAt: now }
-                                  : member
+                                  : member,
                           )
                         : chat.members;
 
@@ -122,7 +121,7 @@ const Messages = () => {
                 return next;
             });
         },
-        [account.id, activeChatId]
+        [account.id, activeChatId],
     );
 
     const activeChat = useMemo(() => {
@@ -153,8 +152,22 @@ const Messages = () => {
         <InboxShell
             showChat={showChat}
             sidebar={
-                <>
-                    <InboxSidebarHeader username={account.username} />
+                <div className="w-full px-4 sm:px-6 py-10">
+
+                    <div className="mb-6 flex items-end justify-between gap-4">
+                        <div>
+                            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
+                                Messages
+                            </h1>
+                            <p className="mt-1 text-sm text-slate-600 dark:text-gray-400">
+                                Your inbox conversations.
+                            </p>
+                        </div>
+
+                        <span className="rounded-full bg-slate-100 ring-1 ring-slate-200/70 px-3 py-1 text-sm text-slate-700 dark:bg-white/10 dark:ring-white/10 dark:text-gray-200">
+                            {chats.length} chat{chats.length === 1 ? "" : "s"}
+                        </span>
+                    </div>
 
                     <div className="py-0 lg:py-4 flex flex-col">
                         {chats.length === 0 ? (
@@ -165,7 +178,8 @@ const Messages = () => {
 
                                 {chats.map((chat) => {
                                     const partnerMember = chat.members.find(
-                                        (member) => member.userId !== account.id
+                                        (member) =>
+                                            member.userId !== account.id,
                                     );
                                     if (!partnerMember) return null;
 
@@ -173,7 +187,8 @@ const Messages = () => {
                                         null) as unknown as IUser | null;
 
                                     const myMember = chat.members.find(
-                                        (member) => member.userId === account.id
+                                        (member) =>
+                                            member.userId === account.id,
                                     );
                                     const isActive = chat.id === activeChatId;
 
@@ -186,9 +201,7 @@ const Messages = () => {
                                     const preview = last
                                         ? last.userId === account.id
                                             ? "You sent a message"
-                                            : `${displayFirstName(
-                                                  partner
-                                              )} sent you a message`
+                                            : `${displayFirstName(partner)} sent you a message`
                                         : "No messages yet.";
 
                                     const readMark = myMember?.lastReadAt
@@ -206,8 +219,8 @@ const Messages = () => {
                                     const previewClass = isActive
                                         ? "text-slate-500 dark:text-white/70"
                                         : unread
-                                        ? "text-slate-900 dark:text-slate-100 font-semibold"
-                                        : "text-slate-600 dark:text-slate-400";
+                                          ? "text-slate-900 dark:text-slate-100 font-semibold"
+                                          : "text-slate-600 dark:text-slate-400";
 
                                     return (
                                         <ChatListItem
@@ -227,7 +240,7 @@ const Messages = () => {
                             </div>
                         )}
                     </div>
-                </>
+                </div>
             }
             main={
                 showChat ? (

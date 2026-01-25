@@ -32,7 +32,7 @@ const SettingModal = ({ open, onClose }: SettingModalProps) => {
             className={`
                 absolute left-2 bottom-full mb-3
                 z-50 p-2 rounded-2xl
-                bg-stone-900/95 backdrop-blur
+                bg-[#0b1013] backdrop-blur
                 ring-1 ring-white/10 shadow-2xl
                 transition-all duration-200
                 ${

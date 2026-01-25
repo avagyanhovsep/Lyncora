@@ -12,18 +12,18 @@ import { fileURLToPath } from "url";
 
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url); 
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const CLIENT_DIST_PATH = path.join(__dirname, "client", "dist"); 
+const CLIENT_DIST_PATH = path.join(__dirname, "client", "dist");
 
 app.use(express.static(CLIENT_DIST_PATH));
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));   
+app.use(express.urlencoded({ extended: true }));
 loadRoutes(app);
 
 const openapiPath = path.resolve("./docs/openapi.yaml");
-const bundledSpec = await SwaggerParser.bundle(openapiPath); 
+const bundledSpec = await SwaggerParser.bundle(openapiPath);
 
 app.use("/api", swaggerUI.serve, swaggerUI.setup(bundledSpec));
 
@@ -31,8 +31,9 @@ app.use((req, res) => {
     res.sendFile(path.join(CLIENT_DIST_PATH, "index.html"));
 });
 
+const isProd = process.env.NODE_ENV === "production";
 await models.sequelize.authenticate();
-await models.sequelize.sync({ alter: true });
+if (!isProd) await models.sequelize.sync({ alter: true });
 
 const server = http.createServer(app);
 

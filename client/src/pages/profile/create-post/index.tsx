@@ -150,7 +150,7 @@ const CreateNewPost = () => {
             }
 
             const formData = new FormData();
-            formData.append("title", postInformation.title);
+            formData.append("title", postInformation.title ?? "");
             formData.append("description", postInformation.description ?? "");
             formData.append("location", postInformation.location ?? "");
             formData.append("tags", JSON.stringify(tags));
@@ -182,7 +182,7 @@ const CreateNewPost = () => {
     };
 
     return (
-        <div className="w-full h-full px-6 pb-20 lg:pb-10 py-10">
+        <div className="w-full min-h-full px-4 sm:px-6 py-10">
             <div className="mx-auto w-full max-w-5xl">
                 <PageHeader
                     title="Create New Post"
@@ -205,7 +205,6 @@ const CreateNewPost = () => {
                                 <TextInput
                                     id="title"
                                     {...register("title", {
-                                        required: "Title is required.",
                                         minLength: {
                                             value: 2,
                                             message: "Title is too short.",

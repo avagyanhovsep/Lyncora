@@ -23,8 +23,8 @@ export default function ChatListItem({
         <button
             onClick={onClick}
             className={`
-                w-full flex items-center gap-3 py-5 lg:py-3 px-5 transition text-left
-                hover:bg-slate-100 dark:hover:bg-white/10
+                w-full flex items-center gap-3 py-5 lg:py-3 px-0 md:px-2 transition text-left
+                hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg
                 ${
                     isActive
                         ? "bg-slate-100 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10"

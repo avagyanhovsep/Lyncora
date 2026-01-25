@@ -1,6 +1,6 @@
 export function InboxEmpty() {
     return (
-        <div className="text-sm text-slate-600 dark:text-slate-400 px-5 py-3">
+        <div className="text-sm text-slate-600 dark:text-slate-400 py-3">
             No chats yet.
         </div>
     );

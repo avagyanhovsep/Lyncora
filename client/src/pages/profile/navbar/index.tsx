@@ -39,10 +39,11 @@ const Navbar = ({ account }: { account: IAccount }) => {
     return (
         <div
             className={`
-                fixed bottom-0 left-0 w-full z-50
+                fixed bottom-0 left-0 w-full z-50   
                 md:static
                 ${collapsed ? "md:w-[76px]" : "md:w-[76px] xl:w-[260px]"}
                 h-[64px] md:h-full
+                pb-[env(safe-area-inset-bottom)] md:pb-0
                 border-t md:border-t-0 md:border-r border-slate-200/70 dark:border-white/10
                 bg-white/85 dark:bg-[#0b1013] md:bg-transparent
                 backdrop-blur-md md:backdrop-blur-0

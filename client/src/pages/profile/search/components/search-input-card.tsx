@@ -23,7 +23,7 @@ export default function SearchInputCard({
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
-                    className="w-full rounded-xl bg-slate-50 text-sm text-slate-900 placeholder-slate-400 ring-1 ring-slate-200/70 py-3 pl-10 pr-3 duration-200 focus:ring-slate-300 focus:outline-none
+                    className="w-full rounded-xl bg-slate-50 text-base text-slate-900 placeholder-slate-400 ring-1 ring-slate-200/70 py-3 pl-10 pr-3 duration-200 focus:ring-slate-300 focus:outline-none
                      dark:bg-black/30 dark:text-slate-100 dark:placeholder-slate-500 dark:ring-white/10 dark:focus:ring-white/30"
                 />
             </div>

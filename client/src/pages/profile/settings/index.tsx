@@ -2,7 +2,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import NiceModal from "@ebay/nice-modal-react";
 import { Axios } from "../../../api";
-import { applyTheme } from "../../../utils/theme";
+import { applyTheme, setStoredTheme } from "../../../utils/theme";
 import type { IContext } from "../../../types";
 import ThemeIcon from "../../../utils/icons/theme-icon";
 import ArrowDownIcon from "../../../utils/icons/arrow-down-icon";
@@ -12,25 +12,6 @@ import PrivacySwitch from "./components/privacy-switch";
 import ConfirmModal from "../components/confirm-modal";
 
 type ThemeMode = "system" | "light" | "dark";
-
-// type OverlayProps = {
-//     onClose: () => void;
-//     children: React.ReactNode;
-// };
-
-// const Overlay = ({ onClose, children }: OverlayProps) => {
-//     return (
-//         <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
-//             <button
-//                 type="button"
-//                 className="absolute inset-0 bg-black/60"
-//                 onClick={onClose}
-//                 aria-label="Close"
-//             />
-//             {children}
-//         </div>
-//     );
-// };
 
 const Settings = () => {
     const navigate = useNavigate();
@@ -82,16 +63,18 @@ const Settings = () => {
 
             setTheme(mode);
             applyTheme(mode);
+            setStoredTheme(mode);
 
             if (!account) return;
 
             setSavingTheme(true);
             try {
                 await Axios.patch("/account/theme", { theme: mode });
-                setAccount(account ? { ...account, theme: mode } : account);
+                setAccount({ ...account, theme: mode });
             } catch {
                 setTheme(prev);
                 applyTheme(prev);
+                setStoredTheme(prev);
             } finally {
                 if (mountedRef.current) setSavingTheme(false);
             }
@@ -122,7 +105,7 @@ const Settings = () => {
     }, [cleanupAndRedirectToSignin]);
 
     return (
-        <div className="w-full px-6 pb-20 md:py-10">
+        <div className="w-full px-4 sm:px-6 py-10">
             <div className="mx-auto w-full max-w-5xl">
                 <div className="mb-6">
                     <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">

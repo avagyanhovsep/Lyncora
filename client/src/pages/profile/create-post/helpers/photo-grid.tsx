@@ -9,7 +9,6 @@ type Props = {
 const PhotoGrid: React.FC<Props> = ({ posts, openPost }) => {
     return (
         <>
-            {/* POSTS */}
             {posts.map((post) => (
                 <Post key={post.id} post={post} openPost={openPost} />
             ))}

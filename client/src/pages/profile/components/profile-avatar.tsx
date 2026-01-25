@@ -1,4 +1,4 @@
- import PencilIcon from "../../../utils/icons/pencil-icon"; 
+import PencilIcon from "../../../utils/icons/pencil-icon";
 
 type Props = {
     src?: string | null;
@@ -21,32 +21,39 @@ export default function ProfileAvatar({
     return (
         <div className="shrink-0 relative">
             <div
-                className={`${box} rounded-full overflow-hidden ring-1 ring-slate-200/70 bg-slate-100 dark:ring-white/10 dark:bg-black/20 ${
-                    editable ? "cursor-pointer" : ""
-                }`}
+                className={[
+                    box,
+                    "rounded-full overflow-hidden",
+                    "ring-2 ring-white/70 shadow-lg shadow-black/20",
+                    "dark:ring-white/10 dark:bg-black/20",
+                    "bg-slate-100",
+                    editable ? "cursor-pointer" : "",
+                    "transition",
+                    "md:hover:shadow-xl md:hover:shadow-black/30",
+                ].join(" ")}
                 onClick={editable ? onPickFile : undefined}
                 title={editable ? "Change avatar" : undefined}
             >
-                {src ? (
-                    <img
-                        src={src}
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <img
-                        src="/assets/default.jpeg"
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                    />
-                )}
+                <img
+                    src={src ? src : "/assets/default.jpeg"}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                />
             </div>
 
             {editable && (
                 <button
                     type="button"
                     onClick={onPickFile}
-                    className="absolute bottom-2 right-2 z-10 flex items-center justify-center w-9 h-9 rounded-full bg-slate-900/80 ring-1 ring-black/10 hover:bg-slate-900 transition-colors active:scale-95 dark:bg-black/70 dark:ring-white/10 dark:hover:bg-black/90"
+                    className="
+                        absolute bottom-2 right-2 z-10
+                        flex items-center justify-center w-9 h-9 rounded-full
+                        bg-slate-900/80 backdrop-blur
+                        ring-1 ring-black/10 shadow-lg shadow-black/30
+                        active:scale-95 transition
+                        dark:bg-black/70 dark:ring-white/10
+                        md:hover:bg-slate-900 md:dark:hover:bg-black/90
+                    "
                     title="Edit avatar"
                 >
                     <PencilIcon className="w-4 h-4 stroke-white" />

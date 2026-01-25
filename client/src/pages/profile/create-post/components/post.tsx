@@ -1,6 +1,5 @@
 import type { IPost } from "../../../../types";
 
-
 const Post = ({ post, openPost }: { post: IPost; openPost: (id: number) => void }) => {
     return (
         <div onClick={() => openPost(post.id)} className="relative cursor-pointer rounded-sm overflow-hidden duration-300 group">

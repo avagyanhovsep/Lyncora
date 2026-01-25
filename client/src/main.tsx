@@ -22,6 +22,23 @@ import EditProfile from "./pages/profile/edit-profile/index.tsx";
 import { SocketProvider } from "./socket/socket-provider.tsx";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+    applyTheme,
+    getStoredTheme,
+    listenSystemThemeChanges,
+} from "./utils/theme";
+
+const initialTheme = getStoredTheme();
+applyTheme(initialTheme);
+
+const stopListening =
+    initialTheme === "system"
+        ? listenSystemThemeChanges(() => applyTheme("system"))
+        : () => {};
+
+window.addEventListener("storage", (e) => {
+    if (e.key === "theme") applyTheme(getStoredTheme());
+});
 
 const router = createBrowserRouter([
     {
@@ -68,5 +85,7 @@ createRoot(document.getElementById("root")!).render(
         <NiceModal.Provider>
             <RouterProvider router={router} />
         </NiceModal.Provider>
-    </SocketProvider>
+    </SocketProvider>,
 );
+
+stopListening();

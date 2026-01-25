@@ -249,7 +249,7 @@ export default function Chat({
 
     return (
         <div className="flex h-full flex-col pb-20 text-slate-900 dark:text-white md:pb-0">
-            <div className="sticky top-0 z-10 w-full border-b border-slate-200/70 bg-white/80 px-2 py-3 backdrop-blur-md dark:border-white/10 dark:bg-[#0b1013]/70 md:px-5">
+            <div className="fixed top-0 z-10 w-full border-b border-slate-200/70 bg-white/80 px-2 py-3 backdrop-blur-md dark:border-white/10 dark:bg-[#0b1013]/70 md:px-5">
                 <div className="flex items-center gap-3">
                     <button
                         type="button"
@@ -354,7 +354,7 @@ export default function Chat({
 
             <div
                 ref={listRef}
-                className="flex-1 overflow-y-auto px-2 py-5 lg:px-5 custom-scrollbar"
+                className="flex-1 overflow-y-auto px-2 lg:px-5 custom-scrollbar pt-[72px] md:pt-[76px] pb-[calc(64px+env(safe-area-inset-bottom)+84px)] md:pb-6"
             >
                 {messages.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center text-center text-slate-500 dark:text-slate-400">
@@ -514,38 +514,50 @@ export default function Chat({
                 )}
             </div>
 
-            <div className="px-4 py-3">
-                <form
-                    onSubmit={onSubmit}
-                    className="flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-3 py-1 backdrop-blur dark:border-white/10 dark:bg-transparent"
-                >
-                    <input
-                        disabled={isDeletedPartner}
-                        className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-50 dark:placeholder:text-slate-500"
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        placeholder={
-                            isDeletedPartner
-                                ? "You can’t message a deleted user."
-                                : "Message…"
-                        }
-                    />
-
-                    <button
-                        type="submit"
-                        disabled={isDeletedPartner || !text.trim()}
-                        className="h-8 w-14 rounded-full bg-indigo-700 transition hover:brightness-110 disabled:bg-slate-200/70 disabled:text-slate-400 dark:disabled:bg-white/10 dark:disabled:text-white/40"
-                        title={
-                            isDeletedPartner
-                                ? "This conversation is read-only"
-                                : "Send"
-                        }
+            <div
+                className={`
+                    md:static
+                    fixed left-0 right-0 z-40
+                    bottom-[calc(64px+env(safe-area-inset-bottom))]
+                    md:bottom-auto
+                    px-2 py-3
+                    bg-white/85 backdrop-blur-md
+                    dark:bg-[#0b1013]/70 
+                `}
+            >
+                <div className="md:px-0">
+                    <form
+                        onSubmit={onSubmit}
+                        className="flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 pl-3 pr-1 py-1 backdrop-blur dark:border-white/10 dark:bg-transparent"
                     >
-                        <span className="flex h-full w-full items-center justify-center">
-                            <PlaneIcon className="h-4 w-4 text-white" />
-                        </span>
-                    </button>
-                </form>
+                        <input
+                            disabled={isDeletedPartner}
+                            className="flex-1 bg-transparent text-sm text-slate-900 placeholder:text-slate-400 outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-50 dark:placeholder:text-slate-500"
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            placeholder={
+                                isDeletedPartner
+                                    ? "You can’t message a deleted user."
+                                    : "Message…"
+                            }
+                        />
+
+                        <button
+                            type="submit"
+                            disabled={isDeletedPartner || !text.trim()}
+                            className="h-8 w-16 rounded-full bg-indigo-700 transition hover:brightness-110 disabled:bg-slate-200/70 disabled:text-slate-400 dark:disabled:bg-white/10 dark:disabled:text-white/40"
+                            title={
+                                isDeletedPartner
+                                    ? "This conversation is read-only"
+                                    : "Send"
+                            }
+                        >
+                            <span className="flex h-full w-full items-center justify-center">
+                                <PlaneIcon className="h-4 w-4 text-white" />
+                            </span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );

@@ -39,7 +39,7 @@ const AccountConfirmation = () => {
     };
 
     return (
-        <div className="w-full max-w-md">
+        <div className="w-full px-2">
             <div className="mb-6 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
                     Enter the code
@@ -49,19 +49,25 @@ const AccountConfirmation = () => {
                 </p>
             </div>
 
-            <div>
-                {errors && (
-                    <p className="text-red-500">{errors.email?.message}</p>
-                )}
-                {errMessage && <p className="text-red-500">{errMessage}</p>}
-            </div>
+            {(errors?.email?.message || errMessage) && (
+                <div className="mb-4 rounded-xl bg-red-500/10 ring-1 ring-red-500/20 px-4 py-3">
+                    {errors?.email?.message ? (
+                        <p className="text-sm text-red-300">
+                            {errors.email.message}
+                        </p>
+                    ) : null}
+                    {errMessage ? (
+                        <p className="text-sm text-red-300">{errMessage}</p>
+                    ) : null}
+                </div>
+            )}
 
-            <div className="rounded-2xl bg-black ring-1 ring-white/10 shadow-2xl backdrop-blur">
+            <div className="rounded-2xl bg-black/40 ring-1 ring-white/10 shadow-2xl backdrop-blur">
                 <form
-                    className="p-6 md:p-8 space-y-5"
+                    className="p-6 md:p-8 space-y-6"
                     onSubmit={handleSubmit(handleSigninVerification)}
                 >
-                    <div className="w-full mx-auto">
+                    <div className="w-full">
                         <OtpInput
                             value={otp}
                             onChange={(v) => {
@@ -72,24 +78,26 @@ const AccountConfirmation = () => {
                             numInputs={6}
                             shouldAutoFocus
                             inputType="tel"
-                            containerStyle="flex gap-5"
+                            containerStyle="flex gap-3 sm:gap-4"
                             renderInput={(props) => (
                                 <input
                                     {...props}
-                                    className="flex-1 h-14 text-center text-2xl rounded-lg bg-transparent ring-1 ring-white/10 focus:ring-1 focus:ring-white/40 focus:outline-none text-slate-100"
+                                    inputMode="numeric"
+                                    className="w-full h-14 text-center text-2xl rounded-xl bg-black/20 ring-1 ring-white/10 focus:ring-white/40 focus:outline-none text-slate-100"
                                 />
                             )}
                         />
+                        <p className="mt-3 text-xs text-slate-400 text-center">
+                            Enter the 6-digit code.
+                        </p>
                     </div>
 
-                    <div className="mt-6">
-                        <button
-                            type="submit"
-                            className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-3 font-semibold text-sm duration-200 text-black hover:bg-neutral-200"
-                        >
-                            Verify
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-sm duration-200 text-black hover:bg-neutral-200 active:scale-[0.98]"
+                    >
+                        Verify
+                    </button>
                 </form>
             </div>
         </div>

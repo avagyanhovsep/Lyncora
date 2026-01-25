@@ -63,7 +63,7 @@ const Requests = () => {
     };
 
     return (
-        <div className="w-full px-6 py-10">
+        <div className="w-full min-h-full px-4 sm:px-6 py-10">
             <div className="mx-auto w-full max-w-5xl">
                 <PageHeaderWithBadge
                     title="Requests"
@@ -78,7 +78,7 @@ const Requests = () => {
                             subtitle="New requests will show up here."
                         />
                     ) : (
-                        <ul className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+                        <ul className={`space-y-3 pr-1`}>
                             {requests.map((request) => (
                                 <RequestRow
                                     key={request.from}

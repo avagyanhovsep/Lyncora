@@ -23,9 +23,16 @@ export default function ProfilePostsCard<TPost extends { id: number }>({
     const [currentPost, setCurrentPost] = useState(-1);
 
     return (
-        <div className="w-full rounded-2xl bg-white ring-1 ring-slate-200/70 overflow-hidden dark:bg-white/5 dark:ring-white/10">
+        <div
+            className="
+                w-full rounded-3xl overflow-hidden
+                ring-1 ring-slate-200/70 bg-white
+                shadow-[0_20px_60px_-40px_rgba(0,0,0,0.35)]
+                dark:bg-white/[0.04] dark:ring-white/10
+            "
+        >
             <div className="p-6 md:p-8">
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex items-start justify-between gap-4 mb-5">
                     <div>
                         <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                             {title}
@@ -42,7 +49,13 @@ export default function ProfilePostsCard<TPost extends { id: number }>({
                         <button
                             type="button"
                             onClick={onCreatePost}
-                            className="hidden sm:inline-flex rounded-xl bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-500 active:scale-95 transition"
+                            className="
+                                inline-flex items-center justify-center
+                                rounded-full px-4 py-2 text-sm font-medium
+                                bg-indigo-600 text-white shadow-lg shadow-indigo-600/20
+                                active:scale-95 transition
+                                md:hover:bg-indigo-500
+                            "
                         >
                             Create post
                         </button>
@@ -54,8 +67,14 @@ export default function ProfilePostsCard<TPost extends { id: number }>({
                         Hidden
                     </div>
                 ) : posts.length === 0 ? (
-                    <div className="rounded-2xl bg-slate-50 ring-1 ring-slate-200/70 p-10 text-center dark:bg-black/20 dark:ring-white/10">
-                        <p className="text-sm text-slate-700 dark:text-slate-200">
+                    <div
+                        className="
+                            rounded-2xl p-10 text-center
+                            bg-slate-50/80 ring-1 ring-slate-200/70
+                            dark:bg-black/20 dark:ring-white/10
+                        "
+                    >
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
                             No posts yet.
                         </p>
 
@@ -68,7 +87,12 @@ export default function ProfilePostsCard<TPost extends { id: number }>({
                                 <button
                                     type="button"
                                     onClick={onCreatePost}
-                                    className="mt-5 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm text-white hover:bg-indigo-500 active:scale-95 transition"
+                                    className="
+                                        mt-5 rounded-full px-5 py-2.5 text-sm font-medium
+                                        bg-indigo-600 text-white shadow-lg shadow-indigo-600/20
+                                        active:scale-95 transition
+                                        md:hover:bg-indigo-500
+                                    "
                                 >
                                     Create a post
                                 </button>

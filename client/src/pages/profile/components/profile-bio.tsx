@@ -9,7 +9,9 @@ export default function ProfileBio({
 
     return (
         <div className="w-full">
-            <p className="text-sm text-slate-600 dark:text-gray-400">{text}</p>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-gray-400">
+                {text}
+            </p>
         </div>
     );
 }

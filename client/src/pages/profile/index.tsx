@@ -13,18 +13,17 @@ import ProfilePostsCard from "./components/profile-post-card.tsx";
 const Account = () => {
     const { account, setAccount } = useOutletContext<IContext>();
     const navigate = useNavigate();
-
     const avatarPicture = useRef<HTMLInputElement | null>(null);
 
     const followersCount = useMemo(
         () => account.followers.filter((follower) => follower.approved).length,
-        [account.followers]
+        [account.followers],
     );
 
     const followingsCount = useMemo(
         () =>
             account.followings.filter((following) => following.approved).length,
-        [account.followings]
+        [account.followings],
     );
 
     const handleAvatarUpload = () => {
@@ -39,7 +38,7 @@ const Account = () => {
                 setAccount({
                     ...account,
                     avatarURL: response.data.picture,
-                })
+                }),
             )
             .catch((err) => console.log(err));
     };
@@ -52,7 +51,7 @@ const Account = () => {
     };
 
     return (
-        <div className="w-full px-6 py-10">
+        <div className="w-full px-4 sm:px-6 py-10">
             <div className="mx-auto w-full max-w-5xl flex flex-col gap-6">
                 <ProfileHeaderCard>
                     <div className="w-full flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
@@ -81,7 +80,7 @@ const Account = () => {
                                     </span>
 
                                     {account.isAccountPrivate && (
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 ring-1 ring-slate-200/70 px-2.5 py-1 text-xs text-slate-700 dark:bg-white/10 dark:ring-white/10 dark:text-gray-200">
+                                        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100/80 ring-1 ring-slate-200/70 px-2.5 py-1 text-xs text-slate-700 backdrop-blur dark:bg-white/10 dark:ring-white/10 dark:text-gray-200">
                                             <LockIcon className="w-4 h-4 stroke-slate-700 shrink-0 dark:stroke-white" />
                                             Private
                                         </span>
@@ -90,7 +89,14 @@ const Account = () => {
 
                                 <div className="flex items-center gap-2">
                                     <button
-                                        className="text-sm bg-slate-100 px-4 py-2 rounded-xl ring-1 ring-slate-200/70 duration-300 hover:bg-slate-200/70 active:scale-95 dark:bg-white/10 dark:ring-white/10 dark:hover:bg-white/15"
+                                        className="
+                                            text-sm px-4 py-2 rounded-full
+                                            bg-slate-100/80 ring-1 ring-slate-200/70
+                                            shadow-sm shadow-black/5
+                                            active:scale-95 transition
+                                            dark:bg-white/10 dark:ring-white/10
+                                            md:hover:bg-slate-200/70 md:dark:hover:bg-white/15
+                                        "
                                         onClick={() =>
                                             navigate("/profile/edit")
                                         }
@@ -103,7 +109,15 @@ const Account = () => {
                                         onClick={() =>
                                             navigate("/profile/settings")
                                         }
-                                        className="p-2 rounded-xl ring-1 ring-slate-200/70 hover:bg-slate-100 transition active:scale-95 dark:ring-white/10 dark:hover:bg-white/10"
+                                        className="
+                                            p-2 rounded-full
+                                            ring-1 ring-slate-200/70
+                                            bg-white/40 backdrop-blur
+                                            shadow-sm shadow-black/5
+                                            active:scale-95 transition
+                                            dark:bg-black/20 dark:ring-white/10
+                                            md:hover:bg-slate-100 md:dark:hover:bg-white/10
+                                        "
                                         title="Settings"
                                     >
                                         <SettingsIcon />

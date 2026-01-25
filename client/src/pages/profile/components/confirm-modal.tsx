@@ -10,7 +10,7 @@ export type ConfirmModalProps = {
     cancelText?: string;
 
     variant?: "danger" | "default";
-    confirmTone?: "solid" | "ghost"; 
+    confirmTone?: "solid" | "ghost";
 
     onConfirm: () => Promise<void> | void;
     onSuccess?: () => void;
@@ -82,7 +82,7 @@ const ConfirmModal = NiceModal.create((props: ConfirmModalProps) => {
         <div
             className={`
         fixed inset-0 z-[999]
-        flex items-end justify-center sm:items-center
+        flex items-center justify-center
         bg-black/50 backdrop-blur-[2px]
         transition-opacity duration-200
         ${modal.visible ? "opacity-100" : "opacity-0 pointer-events-none"}
@@ -100,9 +100,9 @@ const ConfirmModal = NiceModal.create((props: ConfirmModalProps) => {
                 className={`
           w-full max-w-sm rounded-2xl
           bg-white text-slate-900 ring-1 ring-slate-200/70 shadow-2xl
-          p-4 mb-4 sm:mb-0
-          transform transition-transform duration-200
-          ${modal.visible ? "translate-y-0" : "translate-y-4"}
+          p-4
+          transform transition-all duration-200
+          ${modal.visible ? "scale-100 opacity-100" : "scale-95 opacity-0"}
           dark:bg-neutral-950 dark:text-slate-100 dark:ring-white/10
         `}
             >

@@ -26,56 +26,61 @@ export default function Email() {
                 const error = (err as AxiosError).response?.data as {
                     message: string;
                 };
-
                 if (error) setErrMessage(error.message);
             });
     };
 
     return (
-        <div className="w-full max-w-md">
-            <div className="mb-6 text-center">
+        <div className="w-full p-2">
+            <div className="mb-8 text-center">
                 <h1 className="text-3xl font-bold tracking-tight">
                     Enter your email
                 </h1>
-            </div>
-            <div className="">
-                {errors && (
-                    <p className="text-red-500">{errors.email?.message}</p>
-                )}
-                {errMessage && <p className="text-red-500">{errMessage}</p>}
+                <p className="mt-2 text-sm text-slate-400">
+                    We’ll send you a 6-digit code to reset your password.
+                </p>
             </div>
 
-            <div className="rounded-2xl bg-black ring-1 ring-white/10 shadow-2xl backdrop-blur">
+            {(errors.email?.message || errMessage) && (
+                <div className="mb-4 rounded-xl bg-red-500/10 ring-1 ring-red-500/20 px-4 py-3">
+                    {errors.email?.message ? (
+                        <p className="text-sm text-red-300">
+                            {errors.email.message}
+                        </p>
+                    ) : null}
+                    {errMessage ? (
+                        <p className="text-sm text-red-300">{errMessage}</p>
+                    ) : null}
+                </div>
+            )}
+
+            <div className="rounded-2xl bg-black/40 ring-1 ring-white/10 shadow-2xl backdrop-blur-sm">
                 <form
                     className="p-6 md:p-8 space-y-5"
                     onSubmit={handleSubmit(handleForgotPasword)}
                 >
-                    <div className="mt-4">
-                        <div className="relative">
-                            <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <EnvelopeIcon className="w-5 h-5 stroke-slate-400" />
-                            </span>
+                    <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <EnvelopeIcon className="w-5 h-5 stroke-slate-400" />
+                        </span>
 
-                            <input
-                                id="email"
-                                type="email"
-                                inputMode="email"
-                                autoComplete="email"
-                                placeholder="Email"
-                                {...register("email")}
-                                className="w-full rounded-md bg-transparent text-sm ring-1 ring-white/10 placeholder-slate-500 text-slate-100 py-3 pl-10 pr-3 duration-200 focus:ring-white/40"
-                            />
-                        </div>
+                        <input
+                            id="email"
+                            type="email"
+                            inputMode="email"
+                            autoComplete="email"
+                            placeholder="you@example.com"
+                            {...register("email")}
+                            className="w-full rounded-xl bg-black/20 text-sm ring-1 ring-white/10 placeholder-slate-500 text-slate-100 py-3 pl-10 pr-3 duration-200 focus:outline-none focus:ring-white/40"
+                        />
                     </div>
 
-                    <div className="mt-6">
-                        <button
-                            type="submit"
-                            className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-3 font-semibold text-sm duration-200 text-black hover:bg-neutral-200"
-                        >
-                            Send the code
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-sm duration-200 text-black hover:bg-neutral-200 active:scale-[0.98]"
+                    >
+                        Send the code
+                    </button>
                 </form>
             </div>
         </div>
