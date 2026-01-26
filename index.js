@@ -106,6 +106,9 @@ io.on("connection", (socket) => {
     });
 });
 
-server.listen(4002, () =>
-    console.log("Server started on http://localhost:4002"),
-);
+const PORT = Number(process.env.PORT || 4002);
+const HOST = process.env.HOST || "0.0.0.0";
+
+server.listen(PORT, HOST, () => {
+    console.log(`Listening on ${HOST}:${PORT}`);
+});
